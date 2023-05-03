@@ -23,7 +23,7 @@ TwoChoiceCounter.ProcessTwoChoiceCounter <- function(tracker) {
 
 
 TwoChoiceCounter.SetPIData<-function(tracker){
-  rd<-Tracker.GetRawData(tracker)
+  rd<-Counter.GetRawData(tracker)
   nm<-names(rd)  
   treatments<-unique(tracker$ExpDesign$Treatment)  
   
@@ -34,21 +34,24 @@ TwoChoiceCounter.SetPIData<-function(tracker){
   tmp<-tracker$ExpDesign
   a<-rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[1]]
   b<-rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[2]]  
+  regionCount = (a-b)
   
-  pi<-a-b  
-  
-  rd<-data.frame(rd$Minutes,rd$Frame,a,b,pi,rd$NObjects,rd$Indicator)
-  names(rd)<-c("Minutes","Frame",treatments[1],treatments[2],"PI","Flies","Indicator")
+  rd<-data.frame(rd$Minutes,rd$Frame,a,b,regionCount,rd$NObjects,rd$Indicator)
+  names(rd)<-c("Minutes","Frame","a","b","RegionCount","Flies","Indicator")
   row.names(rd)<-NULL  
   
-  tmp<-rd %>% group_by(Minutes)%>% summarise(PI = sum(PI), Flies = sum(Flies), Frame=mean(Frame))
+  tmp<-rd %>% group_by(Minutes) %>% summarise(A=sum(a), B=sum(b), RegionCount = sum(RegionCount), Flies = sum(Flies), Frame=mean(Frame),Indicator=mean(Indicator))
+  names(tmp)<-c("Minutes",treatments[1],treatments[2],"RegionCount","Flies","Frame","Indicator")
+  PI <- tmp$RegionCount/tmp$Flies
+  
+  tmp<-data.frame(tmp,PI)
   
   tracker$PIData<-tmp
   tracker
 }
 
 Summarize.TwoChoiceCounter<-function(tracker,range=c(0,0),ShowPlot=TRUE){  
-  rd<-Tracker.GetRawData(tracker,range)  
+  rd<-Counter.GetRawData(tracker,range)  
   
   treatments<-unique(tracker$ExpDesign$Treatment)    
   if(length(treatments)!=2) {    
@@ -61,7 +64,9 @@ Summarize.TwoChoiceCounter<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   b<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[2]])
   c<-sum(rd$CountingRegion==treatments[3])
   
-  r.tmp<-matrix(c(a,b,c),nrow=1)
+  d<-sum()
+  
+  r.tmp<-matrix(c(a,b,c,d),nrow=1)
   results<-data.frame(tracker$ID,r.tmp,range[1],range[2])
   names(results)<-c("ObjectID","TrackingRegion",treatments,"StartMin","EndMin")
   
@@ -75,73 +80,82 @@ Summarize.TwoChoiceCounter<-function(tracker,range=c(0,0),ShowPlot=TRUE){
 }
 
 ## Public Functions
-FinalPI.TwoChoiceTracker<-function(tracker,range=c(0,0)) {
-  tmp<-GetPIData(tracker,range)
-  n<-sum(tmp$PI)
-  d<-sum(abs(tmp$PI))    
+
+GetPIData.TwoChoiceCounter<-function(counter,range=c(0,0)){
+  pd<-counter$PIData
+  if(sum(range)!=0) {    
+    pd<- pd[(pd$Minutes>range[1]) & (pd$Minutes<range[2]),]
+  }
+  pd
+}
+
+
+FinalPI.TwoChoiceCounter<-function(counter,range=c(0,0)) {
+  tmp<-GetPIData(counter,range)
+  n<-sum(tmp$PI*tmp$Flies)/sum(tmp$Flies)
+  d<-sum(tmp$Flies)    
   if(d==0)
     result<-0
   else
-    result<-n/d  
+    result<-n
   result
 }
 
-CumulativePI.TwoChoiceTracker<-function(tracker,range=c(0,0)){
+CumulativePI.TwoChoiceCounter<-function(counter,range=c(0,0)){
+  tmp<-GetPIData(counter,range)
+  a<-(tmp$PI*tmp$Flies)
+  b<-(tmp$Flies)
   
-  d<-GetPIData(tracker,range)
-  n<-cumsum(d$PI)
-  den<-cumsum(abs(d$PI))
-  y<-n/den
-  y[den==0]<-0
-  PI<-y  
+  aa<-cumsum(a)
+  bb<-cumsum(b)
   
-  ## Since we know this function is only called for TwoChoiceTracker
-  ## we can assume the column positions.
+  cc<-aa/bb
   
-  regions<-c(colnames(d))
-  regions<-regions[c(2,3)]
+  cumRegion1<-cumsum(tmp[,2])
+  cumRegion2<-cumsum(tmp[,3])
+  cumRegionDiff<-cumsum(tmp[,4])
+  cumFlies<-cumsum(tmp[,5])
   
-  CumPosA<-cumsum(d[,2])
-  CumPosB<-cumsum(d[,3])
-  
-  result<-data.frame(d$Minutes,PI,CumPosA,CumPosB,d$Indicator)
-  names(result)<-c("Minutes","CumPI",regions[1],regions[2],"Indicator")
+  result<-data.frame(tmp$Minutes,cc,cumRegion1,cumRegion2,cumRegionDiff,cumFlies,tmp$Indicator)
+  regionNames<-paste("Cum",names(tmp)[2:3],sep="")
+  names(result)<-c("Minutes","CumPI",regionNames,"CumRegionCount","CumFlies","Indicator")
   result
 }
 
-Plot.TwoChoiceTracker<-function(tracker,range=c(0,0)){
-  PIPlots.TwoChoiceTracker(tracker,range)
+Plot.TwoChoiceCounter<-function(counter,range=c(0,0)){
+  PIPlots.TwoChoiceCounter(counter,range)
 }
 
-PIPlots.TwoChoiceTracker<-function(tracker,range=c(0,0)){
-  pd<-CumulativePI(tracker,range)
+PIPlots.TwoChoiceCounter<-function(counter,range=c(0,0)){
+  piData<-GetPIData(counter,range)
+  pd<-CumulativePI(counter,range)
   nms<-names(pd)
   
-  cumsums<-data.frame(c(pd[,1],pd[,1]),c(pd[,3],pd[,4]),rep(c(nms[3],nms[4]),c(length(pd[,1]),length(pd[,1]))),c(pd[,5],pd[,5]))
+  cumsums<-data.frame(c(pd[,1],pd[,1]),c(pd[,3],pd[,4]),rep(c(nms[3],nms[4]),c(length(pd[,1]),length(pd[,1]))),c(pd[,7],pd[,7]))
   names(cumsums)<-c("Minutes","CumSum","Treatment","Indicator")
   
   ymax<-max(pd[c(3,4)])
   x<-ggplot(cumsums) + 
-    geom_rect(aes(xmin = Minutes, xmax = dplyr::lead(Minutes,default=0), ymin = -Inf, ymax = Inf, fill = factor(Indicator)), show.legend=F)+  
-    scale_fill_manual(values = alpha(c("gray", "red"), .07)) +
+    geom_rect(aes(xmin = Minutes, xmax = dplyr::lead(Minutes,default=0), ymin = -Inf, ymax = Inf, fill = factor(Indicator)), show.legend=F)+
+    scale_fill_manual(values = alpha(c("gray","red", "green"), .07)) +
     geom_point(aes(Minutes,CumSum,color=Treatment)) +
     geom_line(aes(Minutes,CumSum,color=Treatment)) +
-    ggtitle(paste("Tracker:",tracker$Name, "   Treatment Counts",sep="")) +
-    xlab("Minutes") + ylab("Frames") + ylim(0,ymax)
+    ggtitle(paste("Counter:",counter$Name, "   Treatment Counts",sep="")) +
+    xlab("Minutes") + ylab("Cumulative Fly Counts") + ylim(0,ymax)
   
   y<-ggplot(pd) + 
     geom_rect(aes(xmin = Minutes, xmax = dplyr::lead(Minutes,default=0), ymin = -Inf, ymax = Inf, fill = factor(Indicator)), show.legend=F)+  
-    scale_fill_manual(values = alpha(c("gray", "red"), .07)) +
+    scale_fill_manual(values = alpha(c("gray", "red","green"), .07)) +
     geom_point(aes(Minutes,CumPI)) +
     geom_line(aes(Minutes,CumPI)) +
-    ggtitle(paste("Tracker:",tracker$Name, "   Cumulative PI",sep="")) +
+    ggtitle(paste("Counter:",counter$Name, "   Cumulative PI",sep="")) +
     xlab("Minutes") + ylab("PI") + ylim(-1,1)
   
   print(x)
   print(y)
 }
 
-TimeDependentPIPlots.TwoChoiceTracker<-function(tracker,window.size.min=10,step.size.min=3,symbol.mult=5){
+TimeDependentPIPlots.TwoChoiceCounter<-function(counter,window.size.min=10,step.size.min=3,symbol.mult=5){
   
   ## Get earliest minute possible to avoid edge effects
   low<-floor(Tracker.FirstSampleData(tracker)$Minutes)+window.size.min
@@ -190,14 +204,3 @@ TimeDependentPIPlots.TwoChoiceTracker<-function(tracker,window.size.min=10,step.
   results  
 }
 
-GetPIData.TwoChoiceTracker<-function(tracker,range=c(0,0)){
-  pd<-tracker$PIData
-  if(sum(range)!=0) {    
-    pd<- pd[(pd$Minutes>range[1]) & (pd$Minutes<range[2]),]
-  }
-  if(tracker$Parameters$Filter.Sleep==TRUE)
-    pd<-pd[pd$Sleeping==0,]
-  if(tracker$Parameters$Filter.Tracker.Error==1)
-    pd<-pd[pd$DataQuality=="High",]
-  pd
-}

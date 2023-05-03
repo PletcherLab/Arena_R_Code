@@ -1,5 +1,5 @@
 ## Private Functions
-TwoChoiceCounter.ProcessTwoChoiceCounter <- function(counter) {
+TwoChoiceCounter.ProcessTwoChoiceCounter <- function(tracker) {
   if(is.null(tracker$ExpDesign)){
     stop("Two choice tracker requires experimental design.")
   }
@@ -16,13 +16,13 @@ TwoChoiceCounter.ProcessTwoChoiceCounter <- function(counter) {
   if(length(unique(tracker$ExpDesign$Treatment))!=2){
     stop("Two choice tracker requires exactly two treatments.")
   }  
-  tracker <- TwoChoiceTracker.SetPIData(tracker)
-  class(tracker) <- c("TwoChoiceTracker", class(tracker))
+  tracker <- TwoChoiceCounter.SetPIData(tracker)
+  class(tracker) <- c("TwoChoiceCounter", class(tracker))
   tracker
 }
 
 
-TwoChoiceCounter.SetPIData<-function(counter){
+TwoChoiceCounter.SetPIData<-function(tracker){
   rd<-Tracker.GetRawData(tracker)
   nm<-names(rd)  
   treatments<-unique(tracker$ExpDesign$Treatment)  
@@ -37,11 +37,13 @@ TwoChoiceCounter.SetPIData<-function(counter){
   
   pi<-a-b  
   
-  rd<-data.frame(rd$Minutes,a,b,pi,rd$Indicator)
-  names(rd)<-c("Minutes",treatments[1],treatments[2],"PI","Indicator")
-  
+  rd<-data.frame(rd$Minutes,rd$Frame,a,b,pi,rd$NObjects,rd$Indicator)
+  names(rd)<-c("Minutes","Frame",treatments[1],treatments[2],"PI","Flies","Indicator")
   row.names(rd)<-NULL  
-  tracker$PIData<-rd
+  
+  tmp<-rd %>% group_by(Minutes)%>% summarise(PI = sum(PI), Flies = sum(Flies), Frame=mean(Frame))
+  
+  tracker$PIData<-tmp
   tracker
 }
 
@@ -60,11 +62,11 @@ Summarize.TwoChoiceCounter<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   c<-sum(rd$CountingRegion==treatments[3])
   
   r.tmp<-matrix(c(a,b,c),nrow=1)
-  results<-data.frame(tracker$ID,range[1],range[2],r.tmp)
-  names(results)<-c("ObjectID","TrackingRegion","AvgSpeed","StartMin","EndMin",treatments)
+  results<-data.frame(tracker$ID,r.tmp,range[1],range[2])
+  names(results)<-c("ObjectID","TrackingRegion",treatments,"StartMin","EndMin")
   
   if(ShowPlot){
-    tmp<-data.frame(c(results$PercWalking,results$PercMicroMoving,results$PercResting,results$PercSleeping),rep("one",4), factor(c("Walking","MicroMoving","Resting","Sleeping")))
+    tmp<-data.frame(c(results[,3],results[,4],results[,5]),rep("one",3), factor(c(treatments[1],treatments[2],treatments[3])))
     names(tmp)<-c("a","b","Movement")
     print(qplot(x=b,y=a,data=tmp, fill=(Movement)) + geom_bar(stat="identity")+ xlab("Treatment") + ylab("Percentage")) 
   }

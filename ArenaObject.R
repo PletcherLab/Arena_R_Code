@@ -48,9 +48,9 @@ ArenaCounterClass<-function(parameters,dirname="Data"){
   cf<-tmp$TrackingRegion
   
   trackers<-data.frame(str_sort(cf,numeric=TRUE))
-  trackers<-data.frame(trackers,rep("NA",nrow(trackers)))
+  trackers<-data.frame(rep("NA",nrow(trackers)),trackers)
   
-  names(trackers)<-c("TrackingRegion","ObjectID")
+  names(trackers)<-c("ObjectID","TrackingRegion")
   #trackers<-tmp %>% slice(match(tmp2,TrackingRegion))
   
   ## Get the tracking ROI and the Counting ROI
@@ -78,13 +78,13 @@ ArenaCounterClass<-function(parameters,dirname="Data"){
   arena <- list(Name = "ArenaCounter1", Trackers = trackers, ROI = roi, ExpDesign=expDesign, DataDir=dirname, FileName=dirname)
   if(nrow(trackers)>0){
     for(i in 1:nrow(trackers)){
-      nm<-paste("Tracker",trackers[i,1],sep="_")
+      nm<-paste("Counter",trackers[i,]$TrackingRegion,sep="_")
       roinm<-trackers[i,1]
       theROI<-c(roi$Width[roi$Name==roinm],roi$Height[roi$Name==roinm])
       theCountingROI<-roi$Name[roi$Type=="Counting"]
       if(length(theCountingROI)<1)
         theCountingROI<-"None"
-      tmp<-CounterClass.RawDataFrame(trackers[i,1],parameters,theData,theROI,theCountingROI,expDesign)
+      tmp<-CounterClass.RawDataFrame(trackers[i,],parameters,theData,theROI,theCountingROI,expDesign)
       arena<-c(arena,setNames(list(nm=tmp),nm))
     }
   }
@@ -275,6 +275,19 @@ Arena.GetTracker<-function(arena,id){
   arena[[tmp]]
 }
 
+Arena.GetCounter<-function(arena,id){
+  if(length(id)<2){
+    tmp<-paste("Counter_",id,sep="")  
+  }
+  else if(length(id)==2){
+    tmp<-paste("Counter_",id$TrackingRegion,sep="")
+  }
+  else{
+    tmp=""
+  }
+  arena[[tmp]]
+}
+
 GetMeanXPositions.Arena<-function(arena,range=c(0,0)){
   for(i in 1:nrow(arena$Trackers)){
     tt<-arena$Trackers[i,]
@@ -309,7 +322,7 @@ GetQuartileXPositions.Arena<-function(arena,quartile=1,range=c(0,0)){
 Summarize.ArenaCounter<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TRUE){
   for(i in 1:nrow(arena$Trackers)){
     tt<-arena$Trackers[i,]
-    t<-Arena.GetTracker(arena,tt)
+    t<-Arena.GetCounter(arena,tt)
     tmps<-Summarize(t,range,FALSE)
     if(exists("result",inherits = FALSE)==TRUE){
       result<-rbind(result,tmps)       

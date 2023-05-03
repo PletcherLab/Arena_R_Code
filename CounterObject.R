@@ -1,6 +1,7 @@
 source("ParametersClass.R")
 source("PairwiseInteractionCounter.R")
 source("SocialDistanceCounter.R")
+source("TwoChoiceCounter.R")
 
 CounterClass.RawDataFrame <-
   function(id,
@@ -11,7 +12,7 @@ CounterClass.RawDataFrame <-
            expDesign) {
     tmp <- data
     tmp <-
-      subset(tmp,tmp$TrackingRegion == id)
+      subset(tmp,tmp$TrackingRegion == id$TrackingRegion)
     tmp <- droplevels(tmp)
     
     if (is.na(parameters$FPS)) {
@@ -31,10 +32,10 @@ CounterClass.RawDataFrame <-
     tmp$DataQuality <- factor(tmp$DataQuality)
     
     if (!is.null(expDesign)) {
-      expDesign<-subset(expDesign,expDesign$TrackingRegion == id)      
+      expDesign<-subset(expDesign,expDesign$TrackingRegion == id$TrackingRegion)      
     }
-    
-    name<-paste(id)
+    name<-paste(id$TrackingRegion)
+    #name<-paste(id)
     data = list(
       ID = id,
       Name=name,
@@ -52,7 +53,7 @@ CounterClass.RawDataFrame <-
       data <- SocialDistanceCounter.ProcessSocialDistanceCounter(data)
     }
     else if (parameters$TType == "TwoChoiceCounter") {
-      
+      data <- TwoChoiceCounter.ProcessTwoChoiceCounter(data)
     }
     else if(parameters$TType == "Counter"){
       

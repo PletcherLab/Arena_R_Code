@@ -48,8 +48,9 @@ ArenaCounterClass<-function(parameters,dirname="Data"){
   cf<-tmp$TrackingRegion
   
   trackers<-data.frame(str_sort(cf,numeric=TRUE))
+  trackers<-data.frame(trackers,rep("NA",nrow(trackers)))
   
-  names(trackers)<-c("TrackingRegion")
+  names(trackers)<-c("TrackingRegion","ObjectID")
   #trackers<-tmp %>% slice(match(tmp2,TrackingRegion))
   
   ## Get the tracking ROI and the Counting ROI

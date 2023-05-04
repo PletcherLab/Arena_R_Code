@@ -2,7 +2,6 @@ source("ArenaObject.R")
 
 
 TheActualStuff<-function(dirname,mmPerPixel,fps){
-  rm(list=ls())
   ## Do one of the following two
   source("ArenaObject.R")
   
@@ -47,6 +46,7 @@ TheActualStuff<-function(dirname,mmPerPixel,fps){
   
   ## Additional plots and outputs are available for individual trackers, such as
   # TimeDependentPIPlots.TwoChoiceTracker(arena$Tracker_T6_0)
+  file = paste(dirname, "/RESULTS", sep = "")
   save.image(file)
   ###################################
   results
@@ -83,7 +83,7 @@ mm.per.pixel<-0.056
 ## Set FPS=NA if using the live tracking in the arenas.
 ## Set FPS equal to the actual recorded frames per second if you tracked movies.
 #fps<-10
-fps<-NA
+fps<-10
 
 parent.folder<-"TwoChoiceCounterData"
 

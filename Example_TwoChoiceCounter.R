@@ -27,7 +27,7 @@ p<-Parameters.SetParameter(p,mmPerPixel=0.056)
 #dirname<-"InteractionData"
 #arena<-ArenaClass(p,dirname)
 
-dirname<-"TwoChoiceCounterData"
+dirname<-"Test"
 
 arena<-ArenaClass(p,dirname)
 

@@ -2,8 +2,6 @@ source("ArenaObject.R")
 
 
 TheActualStuff<-function(dirname,mmPerPixel,fps){
-  ## Do one of the following two
-  source("ArenaObject.R")
   
   ## Always put this here to remove any old variables
   CleanTrackers()
@@ -76,6 +74,8 @@ RunBatchAnalysis<-function(parentFolder,mmPerPixel,fps){
 ## The next value is for the new CCD camera setup
 ## mm.per.pixel<-0.131
 ## The next value is roughly good for the Arenas
+mm.per.pixel<-0.056
+#mm.per.pixel<-0.131
 
 mm.per.pixel<-0.056
 

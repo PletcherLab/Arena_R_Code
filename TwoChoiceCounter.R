@@ -14,7 +14,8 @@ TwoChoiceCounter.ProcessTwoChoiceCounter <- function(tracker) {
   }
   
   if(length(unique(tracker$ExpDesign$Treatment))!=2){
-    stop("Two choice tracker requires exactly two treatments.")
+    print(tracker$ID)
+    stop("Two choice counter requires exactly two treatments.")
   }  
   tracker <- TwoChoiceCounter.SetPIData(tracker)
   class(tracker) <- c("TwoChoiceCounter", class(tracker))
@@ -64,9 +65,7 @@ Summarize.TwoChoiceCounter<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   b<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[2]])
   c<-sum(rd$CountingRegion==treatments[3])
   
-  d<-sum()
-  
-  r.tmp<-matrix(c(a,b,c,d),nrow=1)
+  r.tmp<-matrix(c(a,b,c),nrow=1)
   results<-data.frame(tracker$ID,r.tmp,range[1],range[2])
   names(results)<-c("ObjectID","TrackingRegion",treatments,"StartMin","EndMin")
   

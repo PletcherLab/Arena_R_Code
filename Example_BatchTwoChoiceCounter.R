@@ -49,6 +49,7 @@ TheActualStuff<-function(dirname,mmPerPixel,fps){
   # TimeDependentPIPlots.TwoChoiceTracker(arena$Tracker_T6_0)
   save.image(file)
   ###################################
+  results
 }
 
 
@@ -56,10 +57,17 @@ TheActualStuff<-function(dirname,mmPerPixel,fps){
 RunBatchAnalysis<-function(parentFolder,mmPerPixel,fps){
   thefolders<-list.dirs(parentFolder)
   thefolders<-thefolders[-1]
+  results<-c(1)
   for(f in thefolders){
     print(paste("Analyzing folder:",f,sep=""))
-    TheActualStuff(f,mmPerPixel,fps)
+    if(dim(results)==NULL){
+      results<-TheActualStuff(f,mmPerPixel,fps)
+    }
+    else {
+      results<-rbind(results,TheActualStuff(f,mmPerPixel,fps))
+    }
   }
+  results
 }
 
 
@@ -79,5 +87,5 @@ fps<-NA
 parent.folder<-"TwoChoiceCounterData"
 
 
-RunBatchAnalysis(parent.folder,mm.per.pixel,fps)
-
+results<-RunBatchAnalysis(parent.folder,mm.per.pixel,fps)
+print(results)

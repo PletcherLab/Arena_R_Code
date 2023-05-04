@@ -20,8 +20,8 @@ p<-Parameters.SetParameter(p,FPS=NA)
 ## The next value is for the new CCD camera setup
 ## mm.per.pixel<-0.131
 ## The next value is roughly good for the Arenas
-mm.per.pixel<-0.056
-##p<-Parameters.SetParameter(p,mmPerPixel=0.056)
+##mm.per.pixel<-0.056
+p<-Parameters.SetParameter(p,mmPerPixel=0.056)
 ##mm.per.pixel<-0.184
 
 #dirname<-"InteractionData"
@@ -33,7 +33,15 @@ arena<-ArenaClass(p,dirname)
 
 ## Get the basic movement data and treatment frame counts
 ## Also outputs some simple barplots of movement.
-results<-Summarize(arena)
+results.before<-Summarize(arena,c(0,10))
+results.during<-Summarize(arena,c(10,40))
+results.after<-Summarize(arena,c(40,50))
+
+Time<-c("Before","During","After")
+results<-rbind(results.before, results.during, results.after)
+results<-data.frame(Time,results)
+
+       
 write.csv(results,file=paste(dirname,"/Results.csv",sep=""),row.names=FALSE)
 
 ## Plot the relevant data.  Plots will be output to PDF, not the ImageMagik requirement above.

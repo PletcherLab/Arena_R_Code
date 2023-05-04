@@ -12,7 +12,7 @@ TheActualStuff<-function(dirname,mmPerPixel,fps){
   ## First make a parameter class
   ## You can define a generic tracker
   ## You must exactly two counting regions in the experiment (not including "None")
-  p<-ParametersClass.TwoChoiceTracker()
+  p<-ParametersClass.TwoChoiceCounter()
   
   ## If you are analyzing a movie, then you need to specify the FPS
   ## that was used when the movie was recorded!
@@ -60,7 +60,7 @@ RunBatchAnalysis<-function(parentFolder,mmPerPixel,fps){
   results<-c(1)
   for(f in thefolders){
     print(paste("Analyzing folder:",f,sep=""))
-    if(dim(results)==NULL){
+    if(is.null(dim(results))){
       results<-TheActualStuff(f,mmPerPixel,fps)
     }
     else {
@@ -76,8 +76,9 @@ RunBatchAnalysis<-function(parentFolder,mmPerPixel,fps){
 ## The next value is for the new CCD camera setup
 ## mm.per.pixel<-0.131
 ## The next value is roughly good for the Arenas
-# mm.per.pixel<-0.0.056
-mm.per.pixel<-0.131
+
+mm.per.pixel<-0.056
+
 
 ## Set FPS=NA if using the live tracking in the arenas.
 ## Set FPS equal to the actual recorded frames per second if you tracked movies.

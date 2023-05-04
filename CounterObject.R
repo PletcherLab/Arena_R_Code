@@ -31,6 +31,11 @@ CounterClass.RawDataFrame <-
     tmp$CountingRegion <- factor(tmp$CountingRegion)
     tmp$DataQuality <- factor(tmp$DataQuality)
     
+    Xpos_mm <- tmp$RelX * parameters$mmPerPixel
+    Ypos_mm <- tmp$RelY * parameters$mmPerPixel
+    
+    tmp<-data.frame(tmp,Xpos_mm,Ypos_mm)
+    
     if (!is.null(expDesign)) {
       expDesign<-subset(expDesign,expDesign$TrackingRegion == id$TrackingRegion)      
     }
@@ -72,4 +77,82 @@ Counter.GetRawData <- function(counter, range = c(0, 0)) {
     rd <- rd[(rd$Minutes > range[1]) & (rd$Minutes < range[2]), ]
   }
   rd
+}
+
+PlotXY.Counter <-
+  function(counter,
+           range = c(0, 0),
+           ShowQuality = FALSE,
+           PointSize = 0.75) {
+    rd <- Counter.GetRawData(counter, range)
+    
+    xlim <- c(min(rd$RelX), max(rd$RelX))
+    ylim <- c(min(rd$RelY), max(rd$RelY))
+    ylim2 <- c(max(rd$RelY), min(rd$RelY))
+    
+    xlims <-
+      c(counter$ROI[1] / -2, counter$ROI[1] / 2) * counter$Parameters$mmPerPixel
+    ylims <-
+      c(counter$ROI[2] / -2, counter$ROI[2] / 2) * counter$Parameters$mmPerPixel
+    x <- ggplot(rd, aes(Xpos_mm, Ypos_mm)) +
+      geom_point() +
+      coord_fixed() +
+      ggtitle(paste("Counter:", counter$Name, sep =
+                      "")) +
+      xlab("XPos (mm)") + ylab("YPos (mm)") + xlim(xlims) +
+      ylim(ylims)
+    print(x)
+  }
+
+PlotX.Counter <- function(counter, range = c(0, 0)) {
+  rd <- Counter.GetRawData(counter, range)
+  
+  ylims <-
+    c(counter$ROI[1] / -2, counter$ROI[1] / 2) * counter$Parameters$mmPerPixel
+  print(
+    ggplot(rd, aes(Minutes, Xpos_mm),
+           xlab = "Minutes", ylab = "XPos (mm)") +  ggtitle(paste("Counter:", counter$Name, sep =
+                                                                    "")) +
+      geom_rect(
+        aes(
+          xmin = Minutes,
+          xmax = dplyr::lead(Minutes, default = 0),
+          ymin = -Inf,
+          ymax = Inf,
+          fill = factor(Indicator)
+        ),
+        show.legend = F
+      ) +
+      scale_fill_manual(values = alpha(c("gray", "red", "green"), .07)) +
+      geom_line(aes(group = 1), size = 2) + ylim(ylims)
+  )
+  
+}
+
+PlotY.Counter <- function(counter, range = c(0, 0)) {
+  rd <- Counter.GetRawData(counter, range)
+  ylims <-
+    c(counter$ROI[2] / -2, counter$ROI[2] / 2) * counter$Parameters$mmPerPixel
+  if(is.null(counter$ExpDesign)){
+    title<-paste("Counter:", counter$Name, sep ="")
+  }
+  else{
+    title<-paste("Counter: ", counter$Name, "  Treatment: ",counter$ExpDesign$Treatment[1],sep ="")
+  }
+  print(
+    ggplot(rd, aes(Minutes, Ypos_mm),
+           xlab = "Minutes", ylab = "YPos (mm)") +  ggtitle(title) +
+      geom_rect(
+        aes(
+          xmin = Minutes,
+          xmax = dplyr::lead(Minutes, default = 0),
+          ymin = -Inf,
+          ymax = Inf,
+          fill = factor(Indicator)
+        ),
+        show.legend = F
+      ) +
+      scale_fill_manual(values = alpha(c("gray", "red","green"), .07)) +
+      geom_line(aes(group = 1), size = 2) + ylim(ylims)
+  )
 }

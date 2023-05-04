@@ -30,3 +30,17 @@ mm.per.pixel<-0.056
 dirname<-"TwoChoiceCounterData"
 
 arena<-ArenaClass(p,dirname)
+
+## Get the basic movement data and treatment frame counts
+## Also outputs some simple barplots of movement.
+results<-Summarize(arena)
+write.csv(results,file=paste(dirname,"/Results.csv",sep=""),row.names=FALSE)
+
+## Plot the relevant data.  Plots will be output to PDF, not the ImageMagik requirement above.
+##PlotX(arena)
+##PlotY(arena)
+PlotXY(arena)
+PIPlots(arena)
+
+## Additional plots and outputs are available for individual trackers, such as
+TimeDependentPIPlots.TwoChoiceTracker(arena$Tracker_T6_0)

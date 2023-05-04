@@ -53,6 +53,5 @@ PIPlots(arena)
 ## Additional plots and outputs are available for individual trackers, such as
 TimeDependentPIPlots.TwoChoiceTracker(arena$Tracker_T6_0)
 
-## See Scott for more details.
 
 

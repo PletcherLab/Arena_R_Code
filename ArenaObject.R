@@ -428,6 +428,25 @@ PlotXY.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   }
 }
 
+PlotXY.ArenaCounter<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+  fname<-paste("./",arena$DataDir,"/",arena$Name,"_XYPlots.pdf",sep="")
+  tmp.list<-list()
+  if(WriteToPDF==TRUE) {
+    #pdf(fname,paper="letter",onefile=TRUE)
+    mypdf(fname,res = 600, height = 9, width = 11, units = "in")
+    par(mfrow=c(3,2))
+  }
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetCounter(arena,tt)
+    PlotXY(t,range)
+  }
+  if(WriteToPDF==TRUE){
+    #graphics.off()
+    mydev.off(fname)
+  }
+}
+
 PlotX.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_XPlots.pdf",sep="")
   tmp.list<-list()
@@ -554,6 +573,22 @@ PIPlots.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   for(i in 1:nrow(arena$Trackers)){
     tt<-arena$Trackers[i,]
     t<-Arena.GetTracker(arena,tt)
+    PIPlots(t,range)
+  }
+  if(WriteToPDF==TRUE){
+    mydev.off(fname)
+  }
+}
+
+PIPlots.ArenaCounter<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+  fname<-paste("./",arena$DataDir,"/",arena$Name,"_PIPlots.pdf",sep="")
+  if(WriteToPDF==TRUE) {
+    ##mypdf(fname,paper="letter",onefile=TRUE)
+    mypdf(fname,res = 600, height = 11, width = 9, units = "in")
+  }
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetCounter(arena,tt)
     PIPlots(t,range)
   }
   if(WriteToPDF==TRUE){

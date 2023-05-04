@@ -158,19 +158,19 @@ PIPlots.TwoChoiceCounter<-function(counter,range=c(0,0)){
 TimeDependentPIPlots.TwoChoiceCounter<-function(counter,window.size.min=10,step.size.min=3,symbol.mult=5){
   
   ## Get earliest minute possible to avoid edge effects
-  low<-floor(Tracker.FirstSampleData(tracker)$Minutes)+window.size.min
+  low<-floor(Tracker.FirstSampleData(counter)$Minutes)+window.size.min
   ## Get latest minute possible
-  high<-floor(Tracker.LastSampleData(tracker)$Minutes)
+  high<-floor(Tracker.LastSampleData(counter)$Minutes)
   tmp<-seq(low,high,by=step.size.min)
   results<-data.frame(matrix(rep(-99,(length(tmp)*5)),ncol=5))
   
-  names(results)<-c("Minutes","PI","CumLicksA","CumLicksB","Indicator")
+  
   
   for(i in 1:length(tmp)){
     results[i,1]<-tmp[i]
     
     
-    pp<-CumulativePI(tracker,c(tmp[i]-window.size.min,tmp[i]))        
+    pp<-CumulativePI(counter,c(tmp[i]-window.size.min,tmp[i]))        
     ii<-nrow(pp)
     
     tmp.names<-colnames(pp)
@@ -178,8 +178,10 @@ TimeDependentPIPlots.TwoChoiceCounter<-function(counter,window.size.min=10,step.
     results[i,3]<-pp[ii,3]
     results[i,4]<-pp[ii,4]
     results[i,2]<-pp[ii,2]
-    results[i,5]<-mean(pp[,5])
+    results[i,5]<-mean(pp[,7])
   }  
+  
+  names(results)<-c("Minutes","PI",tmp.names[3],tmp.names[4],"Indicator")
   
   tmp<-results[,3]+results[,4]
   max.tmp<-max(tmp)
@@ -196,9 +198,9 @@ TimeDependentPIPlots.TwoChoiceCounter<-function(counter,window.size.min=10,step.
     geom_point(size=Size,color=Size) +
     scale_colour_gradient2(name="Test") +
     geom_text(check_overlap = TRUE, vjust="inward",hjust="inward", color="red")+
-    xlim(Tracker.FirstSampleData(tracker)$Minutes,Tracker.LastSampleData(tracker)$Minutes) +
+    xlim(Tracker.FirstSampleData(counter)$Minutes,Tracker.LastSampleData(counter)$Minutes) +
     ylim(-1,1) +
-    ggtitle(paste("ID:",tracker$Name,"    Time-Dependent PI"))
+    ggtitle(paste("ID:",counter$Name,"    Time-Dependent PI"))
   
   print(x)
   results  

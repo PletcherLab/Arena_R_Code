@@ -78,7 +78,7 @@ ArenaCounterClass<-function(parameters,dirname="Data"){
   arena <- list(Name = "ArenaCounter1", Trackers = trackers, ROI = roi, ExpDesign=expDesign, DataDir=dirname, FileName=dirname)
   if(nrow(trackers)>0){
     for(i in 1:nrow(trackers)){
-      nm<-paste("Counter",trackers[i,]$TrackingRegion,sep="_")
+      nm<-paste("Tracker",trackers[i,]$TrackingRegion,sep="_")
       roinm<-trackers[i,1]
       theROI<-c(roi$Width[roi$Name==roinm],roi$Height[roi$Name==roinm])
       theCountingROI<-roi$Name[roi$Type=="Counting"]
@@ -293,11 +293,65 @@ GetQuartileXPositions.Arena<-function(arena,quartile=1,range=c(0,0)){
   result
 }
 
+OutputAliData.ArenaCounter <- function(arena,dirname) {
+  trackers.to.get <- arena$Trackers
+  
+  max.rows<-0
+  for(i in 1:nrow(trackers.to.get)){
+    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
+    if(tmp$Parameters$TType!="PairwiseInteractionCounter"){
+      stop("Ali output not implmented for this type of counter.")
+    }
+    tmp2<-length(tmp$InteractionData$Results$ClosestNeighbor_mm)
+    if(tmp2>max.rows)
+      max.rows<-tmp2
+  }
+  
+  results<-data.frame(matrix(rep(NA,max.rows*(nrow(trackers.to.get)+1)),ncol=nrow(trackers.to.get)+1))
+  
+  results[,1]<-1:nrow(results)
+  for (i in 1:nrow(trackers.to.get)) {
+    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
+    if(tmp$Parameters$TType!="PairwiseInteractionCounter"){
+      stop("Ali output not implmented for this type of counter.")
+    }
+    tmp<-tmp$InteractionData$Results$ClosestNeighbor_mm
+    results[1:length(tmp),i+1] <-tmp
+  }
+  names(results)<-c("Index",trackers.to.get[,1])
+  print(paste(dirname,"/AliOutput.csv",sep=""))
+  write.csv(results,paste(dirname,"/AliOutput.csv",sep=""),row.names = FALSE)
+}
+
+OutputAliData.ArenaTracker <- function(arena,dirname) {
+  stop("This needs to be fixed")
+  trackers.to.get <- arena$Trackers
+  
+  max.rows<-0
+  for(i in 1:nrow(trackers.to.get)){
+    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
+    tmp2<-length(tmp$InteractionData$Results$Distance_mm)
+    if(tmp2>max.rows)
+      max.rows<-tmp2
+  }
+  
+  results<-data.frame(matrix(rep(NA,max.rows*(nrow(trackers.to.get)+1)),ncol=nrow(trackers.to.get)+1))
+  
+  results[,1]<-1:nrow(results)
+  for (i in 1:nrow(trackers.to.get)) {
+    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])$InteractionData$Results$Distance_mm
+    results[1:length(tmp),i+1] <-tmp
+  }
+  names(results)<-c("Index",trackers.to.get[,2])
+  write.csv(results,paste(dirname,"/AliOutput.csv",sep=""),row.names = FALSE)
+}
+
+
 
 Summarize.ArenaCounter<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TRUE){
   for(i in 1:nrow(arena$Trackers)){
     tt<-arena$Trackers[i,]
-    t<-Arena.GetCounter(arena,tt)
+    t<-Arena.GetTracker(arena,tt)
     tmps<-Summarize(t,range,FALSE)
     if(exists("result",inherits = FALSE)==TRUE){
       result<-rbind(result,tmps)       
@@ -586,7 +640,12 @@ Arena.GetTracker<-function(arena,id){
     tmp<-paste("Tracker_",id,sep="")  
   }
   else if(length(id)==2){
-    tmp<-paste("Tracker_",id$TrackingRegion,"_",id$ObjectID,sep="")
+    if(id$ObjectID=="NA" || is.na(id$ObjectID)){
+      tmp<-paste("Tracker_",id$TrackingRegion,sep="")
+    }
+    else {
+      tmp<-paste("Tracker_",id$TrackingRegion,"_",id$ObjectID,sep="")
+    }
   }
   else{
     tmp=""

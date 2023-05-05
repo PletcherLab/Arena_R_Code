@@ -13,7 +13,7 @@ source("./Code/ArenaObject.R")
 ## Always put this here to remove any old variables
 CleanTrackers()
 
-p<-ParametersClass.PairwiseInteractionTracker(8)
+p<-ParametersClass.PairwiseInteractionCounter(8)
 ## saved in the output file by DTrack.
 p<-Parameters.SetParameter(p,FPS=10)
 
@@ -25,5 +25,5 @@ p<-Parameters.SetParameter(p,FPS=10)
  mm.per.pixel<-0.056
 p<-Parameters.SetParameter(p,mmPerPixel=0.131)
 
-dirname<-"./Data/InteractionTrackingData"
+dirname<-"./Data/InteractionCountingData"
 arena <- ArenaClass(p, dirname)

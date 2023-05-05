@@ -11,20 +11,6 @@ GetCountingRegions<-function(data){
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Type specific functions
 Plot<-function(tracker, ...) UseMethod("Plot",tracker)
 Summarize<-function(tracker, ...) UseMethod("Summarize",tracker)
@@ -41,3 +27,4 @@ AnalyzeTransitions<-function(tracker, ...) UseMethod("AnalyzeTransitions",tracke
 SmoothTransitions<-function(tracker, ...) UseMethod("SmoothTransitions",tracker)
 ReportDuration<-function(tracker, ...) UseMethod("ReportDuration",tracker)
 UpdateDistanceCutoff<-function(tracker, ...) UseMethod("UpdateDistanceCutoff",tracker)
+OutputAliData<-function(tracker, ...) UseMethod("OutputAliData",tracker)

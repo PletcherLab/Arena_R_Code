@@ -8,29 +8,22 @@
 
 rm(list=ls())
 ## Do one of the following two
-source("ArenaObject.R")
+source("./Code/ArenaObject.R")
 
 ## Always put this here to remove any old variables
 CleanTrackers()
 
-## First make a parameter class
-## You can define a generic tracker
-p<-ParametersClass()
+p<-ParametersClass.PairwiseInteractionTracker(8)
+## saved in the output file by DTrack.
 p<-Parameters.SetParameter(p,FPS=10)
-arena<-ArenaClass(p,dirname="TrackingData")
 
-rm(list=ls())
+## The next value is for the old CCD cameras
+## mm.per.pixel<-0.2156
+## The next value is for the new CCD camera setup
+## mm.per.pixel<-0.131
+## The next value is roughly good for the Arenas
+ mm.per.pixel<-0.056
+p<-Parameters.SetParameter(p,mmPerPixel=0.131)
 
-require(readr)
-source("ParametersClass.R")
-source("TrackerObject.R")
-source("ArenaObject.R")
-source("GeneralUtility.R")
-
-## In the output directory make sure to include the Experiment .xlxs file as well
-## as the tacking csv files for each run. The original xlxs file is used to define
-## the lanes.
-dirname<-"DDropData"
-parameters<-ParametersClass.DDrop()
-
-ReadDDropFiles(parameters,dirname)
+dirname<-"./Data/InteractionTrackingData"
+arena <- ArenaClass(p, dirname)

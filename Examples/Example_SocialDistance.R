@@ -1,58 +1,49 @@
-
 ###################################
 ## Run this part first
 ## If no errors, then move on....
 rm(list=ls())
 ## Do one of the following two
+source("./Code/SocialDistanceFunctions.R")
 source("./Code/ArenaObject.R")
+## or
+##attach("ARENAFUNCTIONS")
 
-## Always put this here to remove any old variables
-CleanTrackers()
-
-## First make a parameter class
-## You can define a generic tracker
-## You must exactly two counting regions in the experiment (not including "None")
-Interacting.Entities<-5
-p<-ParametersClass.SocialDistanceCounter(Interacting.Entities)
-## saved in the output file by DTrack.
-p<-Parameters.SetParameter(p,FPS=NA)
-
-## The next value is for the old CCD cameras
+## Set distance unit conversion
+## This value is for the old CCD cameras
 ## mm.per.pixel<-0.2156
-## The next value is for the new CCD camera setup
+## This value is for the new CCD camera setup
 ## mm.per.pixel<-0.131
-## The next value is roughly good for the Arenas
-# mm.per.pixel<-0.0.056
-p<-Parameters.SetParameter(p,mmPerPixel=0.131)
+## This value is good for the Arenas
+mm.per.pixel<-0.056
 
-dirname<-"./Data/SocialDistanceData"
-arena<-ArenaClass(p,dirname)
-
-###################################
-
-###################################
-## Run this part second then, copy 
-## folder (now with results)
-## back to its original location
-data.summary<-Summarize(arena)
-## If you want to look at data for only a subset of the experiment, you can
-## pass a range (in minutes)
-##Summarize(arena,range=c(0,10))
+## Set fps=NA if using the live tracking in the arenas.
+## Set fps equal to the actual recorded frames per second if you tracked movies.
+fps=NA
 
 
+## At present, only Counters are allowed for SocialDistance experiments.
+tType = "Counter"
 
-## You can write the data to a file
-write.csv(
-  data.summary,
-  file = paste(dirname, "/DataSummary.csv", sep = ""),
-  row.names = FALSE
-)
+## Set the interacting entities per frame.
+## Frames in which this number of flies are not found will be excluded.
+interacting.entities<-5
 
-#or Copy to a clipboard to enter directly into Excel
-#write.table(data.summary,"clipboard",sep="\t",row.names=FALSE)
-file = paste(dirname, "/RESULTS", sep = "")
-save.image(file)
+dirname = "./Data/SocialDistanceData"
 
-## There is also a simple default plot.
-Plot(arena)
-###################################
+## Execute the analysis and result the arena and results as a list.  The results will also be saved to the data directory as
+## as CVS file
+results<-ExecuteSocialDistanceAnalysis(dirname,fps,mm.per.pixel,tType,interacting.entities)
+
+## To get plots 
+Plot(results$Arena)
+
+## If you would like to iterate through a series of subFolders and 
+## save the results in each, run the batch analysis here
+
+parentDirectory = "./Data/SocialDistanceData"
+## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
+make.plots = TRUE
+batch.results<-ExecuteSocialDistanceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,interacting.entities,make.plots)
+
+## Copy results to clipboard to paste into excel
+write.table(batch.results,"clipboard",sep="\t",row.names=FALSE)

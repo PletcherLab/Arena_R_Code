@@ -27,3 +27,37 @@ p<-Parameters.SetParameter(p,mmPerPixel=0.131)
 
 dirname<-"./Data/InteractionCountingData"
 arena <- ArenaClass(p, dirname)
+
+SubFunction<-function(a,n){
+  result<-NA
+  if(sum(a$NObjects)==n){
+    if(length(a$RelX)<n){
+      result<-0
+    }
+    else if(length(a$RelX)>n){
+      a<-a[a$NObjects>0,]
+      diffx <- diff(a$RelX)
+      diffy <- diff(a$RelY)
+      d <- sqrt(diffx * diffx + diffy * diffy)
+      result<-min(d)
+    }
+    else {
+      diffx <- diff(a$RelX)
+      diffy <- diff(a$RelY)
+      d <- sqrt(diffx * diffx + diffy * diffy)
+      print(mean(d))
+      result<-min(d)
+    }
+  }
+  result
+}
+
+
+counter<-arena$Tracker_Trach
+theData<-counter$RawData
+theData<-theData[1:10,]
+p<-counter$Parameters
+entities<-p$Interacting.Entities
+
+
+counts<-theData %>% group_by(Frame) %>% mutate(AverageNeighborDistance=SubFunction(cur_data(),entities)) %>% summarise(AverageNeighborDistance = mean(AverageNeighborDistance), Objects = sum(NObjects))

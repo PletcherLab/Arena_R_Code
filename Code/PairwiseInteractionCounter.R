@@ -31,6 +31,10 @@ PairwiseInteractionCounter.SetInteractionData<-function(counter) {
       }
       else if(length(a$RelX)>2){
         a<-a[a$NObjects>0,]
+        diffx <- diff(a$RelX)
+        diffy <- diff(a$RelY)
+        d <- sqrt(diffx * diffx + diffy * diffy)
+        result<-d
       }
       else {
         diffx <- diff(a$RelX)

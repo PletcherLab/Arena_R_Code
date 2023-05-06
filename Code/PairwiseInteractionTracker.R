@@ -1,6 +1,4 @@
 source("./Code/GeneralUtility.R")
-
-
 require(data.table)
 require(reshape2)
 require(readxl)
@@ -161,25 +159,17 @@ UpdateDistanceCutoff.PairwiseInteractionTracker <- function(tracker, newcutoff.m
   tracker
 }
 
-
-OutputAliData.PairwiseInteractionTrackerArena <- function(arena,dirname) {
-  trackers.to.get <- arena$Trackers[arena$Trackers$ObjectID == 0, ]
+Plot.PairwiseInteractionTracker<-function(tracker,range = c(0, 0)){
+  id<-tracker$RawData
+  x <- ggplot(id, aes(Frame, ClosestNeighbor_mm, color = IsInteracting)) +
+    geom_point() +
+    ggtitle(paste("Tracker:", tracker$Name, sep =
+                    "")) +
+    geom_smooth(method="auto", se=TRUE, fullrange=FALSE, level=0.95) +
+    xlab("Frame") + ylab("Distance (mm)")
+  print(x)
   
-  tmp <- Arena.GetTracker(arena, trackers.to.get[1, ])
-  results <- data.frame(tmp$RawData[, c("Minutes", "ClosestNeighbor_mm")])
-  names(results) <- c("Minutes", tmp$Name)
-  
-  if (nrow(trackers.to.get) > 1) {
-    for (i in 2:nrow(trackers.to.get)) {
-      tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
-      assign(tmp$Name, tmp$RawData$ClosestNeighbor_mm)
-      results <- data.frame(results, tmp$Name)
-    }
-  }
-
-  write.csv(results,paste(dirname,"/AliOutput.csv",sep=""),row.names = FALSE)
 }
-
 
 ## Functions that just catch misapplied higher functions
 FinalPI.PairwiseInteractionTracker<-function(tracker){

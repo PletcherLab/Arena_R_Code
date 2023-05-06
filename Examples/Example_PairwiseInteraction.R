@@ -23,14 +23,14 @@ fps=NA
 ## Set tracking type
 ## If you used predictive tracking in DTrack set this as "Tracker"
 ## If not use "Counter"
-#tType = "Tracker"
-tType = "Counter"
+tType = "Tracker"
+#tType = "Counter"
 
 ## Set the interactions distances for which you want to analyze
 interaction.distances.mm<-c(2,5,8,10,12)
 
-#dirname = "./Data/InteractionTrackingData"
-dirname = "./Data/InteractionCountingData"
+dirname = "./Data/InteractionTrackingData"
+#dirname = "./Data/InteractionCountingData"
 
 ## Execute the analysis and result the arena and results as a list.  The results will also be saved to the data directory as
 ## as CVS file
@@ -42,8 +42,8 @@ Plot(results$Arena)
 ## If you would like to iterate through a series of subFolders and 
 ## save the results in each, run the batch analysis here
 
-##parentDirectory = "./Data/InteractionTrackingData"
-parentDirectory = "./Data/InteractionCountingData"
+parentDirectory = "./Data/InteractionTrackingData"
+#parentDirectory = "./Data/InteractionCountingData"
 ## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
 make.plots = TRUE
 ExecutePairwiseInteractionAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,interaction.distances.mm,make.plots)

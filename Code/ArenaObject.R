@@ -324,28 +324,24 @@ OutputAliData.ArenaCounter <- function(arena,dirname) {
 }
 
 OutputAliData.ArenaTracker <- function(arena,dirname) {
-  stop("This needs to be fixed")
-  trackers.to.get <- arena$Trackers
+  ## Just get the first of the pair.
+  trackers.to.get <- arena$Trackers[arena$Trackers$ObjectID == 0, ]
   
-  max.rows<-0
-  for(i in 1:nrow(trackers.to.get)){
-    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
-    tmp2<-length(tmp$InteractionData$Results$Distance_mm)
-    if(tmp2>max.rows)
-      max.rows<-tmp2
+  tmp <- Arena.GetTracker(arena, trackers.to.get[1, ])
+  results <- data.frame(tmp$RawData[, c("Minutes", "ClosestNeighbor_mm")])
+  names(results) <- c("Minutes", tmp$Name)
+  
+  if (nrow(trackers.to.get) > 1) {
+    for (i in 2:nrow(trackers.to.get)) {
+      tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])
+      nn<-names(results)
+      results <- data.frame(results, tmp$RawData$ClosestNeighbor_mm)
+      names(results)<-c(nn,tmp$Name)
+    }
   }
   
-  results<-data.frame(matrix(rep(NA,max.rows*(nrow(trackers.to.get)+1)),ncol=nrow(trackers.to.get)+1))
-  
-  results[,1]<-1:nrow(results)
-  for (i in 1:nrow(trackers.to.get)) {
-    tmp <- Arena.GetTracker(arena, trackers.to.get[i, ])$InteractionData$Results$Distance_mm
-    results[1:length(tmp),i+1] <-tmp
-  }
-  names(results)<-c("Index",trackers.to.get[,2])
   write.csv(results,paste(dirname,"/AliOutput.csv",sep=""),row.names = FALSE)
 }
-
 
 
 Summarize.ArenaCounter<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TRUE){
@@ -414,9 +410,6 @@ Summarize.ArenaTracker<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TR
   result
 }
 
-Plot.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
-  PlotXY.ArenaTracker(arena,range,WriteToPDF)
-}
 
 Plot.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_Plots.pdf",sep="")
@@ -438,7 +431,7 @@ Plot.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
 }
 
 
-PlotXY.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+PlotXY.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_XYPlots.pdf",sep="")
   tmp.list<-list()
   if(WriteToPDF==TRUE) {
@@ -457,26 +450,8 @@ PlotXY.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   }
 }
 
-PlotXY.ArenaCounter<-function(arena,range=c(0,0),WriteToPDF=TRUE){
-  fname<-paste("./",arena$DataDir,"/",arena$Name,"_XYPlots.pdf",sep="")
-  tmp.list<-list()
-  if(WriteToPDF==TRUE) {
-    #pdf(fname,paper="letter",onefile=TRUE)
-    mypdf(fname,res = 600, height = 9, width = 11, units = "in")
-    par(mfrow=c(3,2))
-  }
-  for(i in 1:nrow(arena$Trackers)){
-    tt<-arena$Trackers[i,]
-    t<-Arena.GetCounter(arena,tt)
-    PlotXY(t,range)
-  }
-  if(WriteToPDF==TRUE){
-    #graphics.off()
-    mydev.off(fname)
-  }
-}
 
-PlotX.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+PlotX.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_XPlots.pdf",sep="")
   tmp.list<-list()
   if(WriteToPDF==TRUE) {
@@ -495,7 +470,7 @@ PlotX.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   }
 }
 
-PlotY.ArenaTracker<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+PlotY.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_YPlots.pdf",sep="")
   tmp.list<-list()
   if(WriteToPDF==TRUE) {

@@ -147,7 +147,7 @@ Summarize.SocialDistanceCounter<-function(counter,range=c(0,0),ShowPlot=TRUE){
   avg.sem.distance<-mean(rd$SENeighborDistance)
   sem.distance<-sqrt(var(rd$AvgNeighborDistance) / length(rd$AvgNeighborDistance))
   
-  results<-data.frame(counter$ID,total.time,avg.distance,sem.distance,avg.sem.distance,ff[1],ff[2],ff[3],ff[2]/(sum(ff)),
+  results<-data.frame(counter$ID$TrackingRegion,total.time,avg.distance,sem.distance,avg.sem.distance,ff[1],ff[2],ff[3],ff[2]/(sum(ff)),
                       range[1],range[2])
   names(results)<-c("TrackingRegion","ObsMinutes","AvgClosestNeighbor","SEMClosestNeighbor","AvgSEMClosestNeighbor","Zero","OnTarget","OffTarget","PercOnTarget","StartMin","EndMin")
   rownames(results)<-1:nrow(results)

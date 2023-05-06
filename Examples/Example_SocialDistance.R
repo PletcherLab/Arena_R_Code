@@ -4,7 +4,7 @@
 ## If no errors, then move on....
 rm(list=ls())
 ## Do one of the following two
-source("ArenaObject.R")
+source("./Code/ArenaObject.R")
 
 ## Always put this here to remove any old variables
 CleanTrackers()
@@ -25,7 +25,7 @@ p<-Parameters.SetParameter(p,FPS=NA)
 # mm.per.pixel<-0.0.056
 p<-Parameters.SetParameter(p,mmPerPixel=0.131)
 
-dirname<-"SocialDistanceData"
+dirname<-"./Data/SocialDistanceData"
 arena<-ArenaClass(p,dirname)
 
 ###################################

@@ -2,12 +2,26 @@
 ExecuteTwoChoiceAnalysis.Batch<-function(parentFolder,fps,mmPerPixel,trackerType="Tracker",make.plots=FALSE,range=c(0,0)){
   thefolders<-list.dirs(parentFolder)
   thefolders<-thefolders[-1]
+  index<-1
   for(f in thefolders){
     print(paste("Analyzing folder:",f,sep=""))
     tmp<-ExecuteTwoChoiceAnalysis(f,fps,mmPerPixel,trackerType,range)
+    if(index==1){
+      original.names<-names(tmp$Results)
+      results<-data.frame(rep(f,nrow(tmp$Results)),tmp$Results)
+      index<-2
+    }
+    else{
+      tt<-data.frame(rep(f,nrow(tmp$Results)),tmp$Results)
+      results<-rbind(results,tt)
+    }
     if(make.plots==TRUE){
       Plot(tmp$Arena,range)
     }
+  }
+  if(index==2){
+    names(results)<-c("File",original.names)
+    return(results)
   }
 }
 

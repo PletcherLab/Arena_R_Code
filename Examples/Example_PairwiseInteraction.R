@@ -46,7 +46,10 @@ parentDirectory = "./Data/InteractionTrackingData"
 #parentDirectory = "./Data/InteractionCountingData"
 ## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
 make.plots = TRUE
-ExecutePairwiseInteractionAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,interaction.distances.mm,make.plots)
+batch.results<-ExecutePairwiseInteractionAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,interaction.distances.mm,make.plots)
+
+## Copy results to clipboard to paste into excel
+write.table(batch.results,"clipboard",sep="\t",row.names=FALSE)
 
 
 ## To output the Arena data in a form that we can send to Ali do the following

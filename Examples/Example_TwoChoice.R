@@ -47,7 +47,9 @@ Plot(results$Arena)
 parentDirectory = "./Data/TwoChoiceCountingData"
 ## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
 make.plots = TRUE
-ExecuteTwoChoiceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,make.plots)
+batch.results<-ExecuteTwoChoiceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,make.plots)
+## Copy results to clipboard to paste into excel
+write.table(batch.results,"clipboard",sep="\t",row.names=FALSE)
 
 ###############################################################################################
 ## Plot the relevant data.  Plots will be output to PDF, not the ImageMagik requirement above.

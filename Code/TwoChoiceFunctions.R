@@ -39,12 +39,23 @@ ExecuteTwoChoiceAnalysis<-function(dirname,fps,mmPerPixel,trackingType="Tracker"
   }
   
   p <- Parameters.SetParameter(p, FPS = fps, mmPerPixel = mmPerPixel)
-  
   arena<-ArenaClass(p,dirname)
   
-  ## Get the basic movement data and treatment frame counts
-  ## Also outputs some simple barplots of movement.
-  results<-Summarize(arena,range)
+  
+  if(length(range)>2){
+    results<-Summarize(arena,range[c(1,2)])
+    for(i in 2:(length(range)-1)){
+      tmp<-Summarize(arena,range[c(i,i+1)])
+      results<-rbind(results,tmp)
+    }
+  }
+  else {
+    ## Get the basic movement data and treatment frame counts
+    ## Also outputs some simple barplots of movement.
+    results<-Summarize(arena,range)
+  }
+  
+  
   write.csv(results,file=paste(dirname,"/Results.csv",sep=""),row.names=FALSE)
   
   list(Arena=arena,Results=results)

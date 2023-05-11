@@ -42,6 +42,21 @@ ExecutePairwiseInteractionAnalysis<-function(dirname,fps,mmPerPixel,trackingType
   arena <- ArenaClass(p, dirname)
   data.summary<-Summarize(arena,range)
   IDist <- rep(Interaction.Distance.mm[1], nrow(data.summary))
+  
+  if(length(range)>2){
+    results<-Summarize(arena,range[c(1,2)])
+    for(i in 2:(length(range)-1)){
+      tmp<-Summarize(arena,range[c(i,i+1)])
+      results<-rbind(results,tmp)
+    }
+  }
+  else {
+    ## Get the basic movement data and treatment frame counts
+    ## Also outputs some simple barplots of movement.
+    data.summary <- data.frame(IDist, data.summary)
+  }
+  
+  
   data.summary <- data.frame(IDist, data.summary)
   results<-data.summary
   

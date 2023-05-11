@@ -35,7 +35,14 @@ dirname = "./Data/TwoChoiceCountingData"
 
 ## Execute the analysis and result the arena and results as a list.  The results will also be saved to the data directory as
 ## as CVS file
+results<-ExecuteTwoChoiceAnalysis(dirname,fps,mm.per.pixel,tType)
+
+## If you want to limit the analysis to a specific time frame, specify the range in minutes.
 results<-ExecuteTwoChoiceAnalysis(dirname,fps,mm.per.pixel,tType,range=c(0,10))
+
+## Or if you want to break it up into several time slices include the breakpoints as part of
+## the range parameter.
+results<-ExecuteTwoChoiceAnalysis(dirname,fps,mm.per.pixel,tType,range=c(0,10,40,50))
 
 ## To get plots 
 Plot(results$Arena)

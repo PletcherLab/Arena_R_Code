@@ -384,6 +384,60 @@ Summarize.Tracker <- function(tracker,
   results
 }
 
+
+QC.Tracker<- function(tracker,
+                      range = c(0, 0),
+                      ShowPlot = TRUE){
+  
+  rd <- Tracker.GetRawData(tracker, range)
+  total.min <- rd$Minutes[nrow(rd)] - rd$Minutes[1]
+  start.time<-rd$Time[1]
+  end.time<-rd$Time[length(rd$Time)]
+  quality<-rd$DataQuality
+  total.frames<-length(quality)
+  high<-sum(quality=="High")
+  perc.high<-high/total.frames
+ 
+  indis<-sum(quality=="Indiscernible")
+  perc.indis<-indis/total.frames
+  
+  notfound<-sum(quality=="NotFound")
+  perc.notfound<-notfound/total.frames
+  
+  results <-
+    data.frame(
+      tracker$ID,
+      total.min,
+      total.frames,
+      high,
+      indis,
+      notfound,
+      perc.high,
+      perc.indis,
+      perc.notfound,
+      start.time,
+      end.time
+    )
+  
+  names(results) <-
+    c(
+      "ObjectID",
+      "TrackingRegion",
+      "ObsMinutes",
+      "ObsFrames",
+      "High",
+      "Indiscernible",
+      "NotFound",
+      "PercHigh",
+      "PercIndiscernible",
+      "PercNotFound",
+      "StartTime",
+      "EndTime"
+    )
+  
+  results
+}
+
 Plot.Tracker<-function(tracker,
                      range = c(0, 0),
                      ShowQuality = FALSE,

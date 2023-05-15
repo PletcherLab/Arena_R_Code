@@ -8,6 +8,7 @@ require(tibble)
 require(plyr)
 require(dplyr)
 require(ggplot2)
+require(gtools)
 
 
 ArenaClass<-function(parameters,dirname="Data"){
@@ -32,9 +33,9 @@ ArenaCounterClass<-function(parameters,dirname="Data"){
     cat("No tracking files found.")
     flush.console()      
   }
-  
+  files<-mixedsort(files)
   files<-paste(datadir,files,sep="")
-  
+
   theData<-rbindlist(lapply(files, function(x){read.csv(x, header=TRUE)}))
   
   ## Try to correct previous version files.
@@ -103,6 +104,7 @@ ArenaTrackerClass<-function(parameters,dirname="Data"){
     cat("No tracking files found.")
     flush.console()      
   }
+  files<-mixedsort(files)
   files<-paste(datadir,files,sep="")
   
   theData<-rbindlist(lapply(files, function(x){read.csv(x, header=TRUE)}))
@@ -403,6 +405,42 @@ Summarize.ArenaTracker<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TR
     print(ggplot(tmp.result1, aes(x = ID, y = value, fill = Type))+ 
             geom_bar(stat = "identity")+ggtitle(paste("Arena",arena$Name," -- Total Movement")) +
             labs(x="Tracker ID",y="Distance (mm)"))
+    if(WriteToPDF==TRUE){
+      graphics.off()
+    }
+  }
+  result
+}
+
+QC.ArenaTracker<-function(arena,range=c(0,0),ShowPlot=TRUE, WriteToPDF=TRUE){
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetTracker(arena,tt)
+    tmps<-QC(t,range,FALSE)
+    if(exists("result",inherits = FALSE)==TRUE){
+      result<-rbind(result,tmps)       
+    }
+    else {
+      result<-tmps     
+    }
+  }
+  if(ShowPlot==TRUE){
+    if(WriteToPDF==TRUE) {
+      fname<-paste("./",arena$DataDir,"/",arena$Name,"_QCPlots.pdf",sep="")
+      pdf(fname,paper="USr",onefile=TRUE)
+      par(mfrow=c(3,2))
+    }
+    tmp.result<-result[,c("ObjectID","TrackingRegion","PercHigh","PercIndiscernible","PercNotFound")]
+    tmp.result[is.na(tmp.result)]<-0
+    
+    tmp.result1<-melt(tmp.result,id.var=c("TrackingRegion","ObjectID"))
+    tmp.result1<-data.frame(paste(tmp.result1$TrackingRegion,"_",tmp.result1$ObjectID,sep=""),tmp.result1)
+    names(tmp.result1)<-c("ID","TrackingRegion","ObjectID","Type","value")
+    
+    print(ggplot(tmp.result1, aes(x = ID, y = value, fill = Type))+ 
+            geom_bar(stat = "identity")+ggtitle(paste("Arena"," -- Distribution")) +
+            labs(x="Tracker ID",y="Fraction Frames"))
+    
     if(WriteToPDF==TRUE){
       graphics.off()
     }

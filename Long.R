@@ -40,16 +40,26 @@ mm.per.pixel<-0.161
 ## a parameter to the ArenaClass function
 ## ArenaClass<-function(parameters,dirname="Data")
 
-arena<-ArenaClass(p,dirname="./Long/May12_13")
+arena<-ArenaClass(p,dirname="./Long")
+
+qc<-QC(arena)
+write.table(qc,"clipboard",sep="\t",row.names=FALSE)
+
+results<-Summarize(arena,range<-c(60*0,60*0))
+write.table(results,"clipboard",sep="\t",row.names=FALSE)
+
+results<-Summarize(arena,range<-c(60*0,60*6))
+write.table(results,"clipboard",sep="\t",row.names=FALSE)
+
+results<-Summarize(arena,range<-c(60*6,60*12))
+write.table(results,"clipboard",sep="\t",row.names=FALSE)
 
 ## Basic movement information and region summaries can be obtained from
-results<-Summarize(arena,range<-c(12*60,24*60))
+results<-Summarize(arena,range<-c(60*12,60*24))
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
-qc<-QC(arena)
-
 ## Copy results to clipboard to paste into excel
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
-write.table(qc,"clipboard",sep="\t",row.names=FALSE)
+
 ## To plot position information use PlotX for either 
 ## the arena or a specific tracker. If you pass an arena object
 ## the output is sent to a pdf file by default (can be changed)

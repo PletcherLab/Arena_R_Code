@@ -54,11 +54,8 @@ ExecutePairwiseInteractionAnalysis<-function(dirname,fps,mmPerPixel,trackingType
     ## Get the basic movement data and treatment frame counts
     ## Also outputs some simple barplots of movement.
     data.summary <- data.frame(IDist, data.summary)
+    results<-data.summary
   }
-  
-  
-  data.summary <- data.frame(IDist, data.summary)
-  results<-data.summary
   
   if(length(Interaction.Distance.mm)>1){
     for(i in 2:length(Interaction.Distance.mm)){

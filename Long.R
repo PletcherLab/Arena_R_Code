@@ -36,28 +36,37 @@ mm.per.pixel<-0.161
 ##p<-SetParameter(p,Filter.Tracker.Error=`1)
 
 ## Place your tracking data and the experiment file in a subdirectory.
-## If you name it something other than 'Data' you need to supply it as
-## a parameter to the ArenaClass function
-## ArenaClass<-function(parameters,dirname="Data")
+## If you name it something other than 'Long' you need to change
+## the parameter to the ArenaClass function
 
 arena<-ArenaClass(p,dirname="./Long")
 
+## First QC
+## Run these two lines then paste results to excel
 qc<-QC(arena)
 write.table(qc,"clipboard",sep="\t",row.names=FALSE)
 
-results<-Summarize(arena,range<-c(60*0,60*0))
+## Get results for different periods by defining the start
+## and end hours
+start.hours<-0
+end.hours<-24
+results<-Summarize(arena,range<-c(60*start.hours,60*end.hours))
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
 
-results<-Summarize(arena,range<-c(60*0,60*6))
+start.hours<-0
+end.hours<-6
+results<-Summarize(arena,range<-c(60*start.hours,60*end.hours))
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
 
-results<-Summarize(arena,range<-c(60*6,60*12))
+start.hours<-6
+end.hours<-12
+results<-Summarize(arena,range<-c(60*start.hours,60*end.hours))
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
 
+start.hours<-12
+end.hours<-24
 ## Basic movement information and region summaries can be obtained from
-results<-Summarize(arena,range<-c(60*12,60*24))
-write.table(results,"clipboard",sep="\t",row.names=FALSE)
-## Copy results to clipboard to paste into excel
+results<-Summarize(arena,range<-c(60*start.hours,60*end.hours))
 write.table(results,"clipboard",sep="\t",row.names=FALSE)
 
 ## To plot position information use PlotX for either 

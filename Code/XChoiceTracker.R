@@ -21,7 +21,13 @@ XChoiceTracker.ProcessXTracker <- function(tracker) {
 
 XChoiceTracker.SetXData<-function(tracker){
   ## This will use the PI-Multiplier to adjust all X values.
-  pimult <- tracker$ExpDesign$PIMult[tracker$ExpDesign$ID == tracker$ID]  
+  tmp.id<-tracker$ID
+  tmp<-tracker$ExpDesign[tmp.id$ObjectID == tracker$ExpDesign$ObjectID,]
+  tmp<-tmp[tmp$TrackingRegion == tracker$ExpDesign$TrackingRegion,]
+  if(nrow(tmp)<1){
+    stop("Problem in ExpDesign in XChoice Tracker!")
+  }
+  pimult <- tmp$PIMult[1]
   tracker$RawData$RelX <- tracker$RawData$RelX * pimult
   tracker
 }
@@ -52,8 +58,11 @@ Summarize.XChoiceTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   
   r.tmp<-matrix(c(a,b,c),nrow=1)
   
-  results<-data.frame(tracker$ID,total.min,total.dist,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,avg.speed,range[1],range[2],r.tmp)
-  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed","StartMin","EndMin",treatments)
+  avg.x<-mean(rd$Xpos_mm)
+  var.x<-var(rd$Xpos_mm)
+  
+  results<-data.frame(tracker$ID,total.min,total.dist,avg.x,var.x,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,avg.speed,range[1],range[2],r.tmp)
+  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","AvgXPosmm","VarXPosmm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed","StartMin","EndMin",treatments)
   
   if(ShowPlot){
     tmp<-data.frame(c(results$PercWalking,results$PercMicroMoving,results$PercResting,results$PercSleeping),rep("one",4), factor(c("Walking","MicroMoving","Resting","Sleeping")))

@@ -22,7 +22,7 @@ ExecuteDDropAnalysis<-function(f,p,make.plots=TRUE){
   write.csv(results$PerRun,file=outputfile,row.names=FALSE)
   outputfile<- paste("./",f,"/DDropResultsPerFly.csv",sep="")
   write.csv(results$PerFly,file=outputfile,row.names=FALSE)
-  if(make.plots=+TRUE){
+  if(make.plots==TRUE){
   ## Plots can be useful as well
     PlotY(ARENA1)
   }

@@ -84,6 +84,13 @@ ParametersClass.TwoChoiceTracker=function(){
   p
 }
 
+ParametersClass.CentrophobismTracker=function(){
+  p<-ParametersClass()
+  p<-Parameters.SetParameter(p,TType="CentrophobismTracker")
+  p
+}
+
+
 ParametersClass.ArenaCounter=function(){
   p<-ParametersClass()
   p<-Parameters.SetParameter(p,TType="Counter")

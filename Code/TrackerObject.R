@@ -1,6 +1,7 @@
 source("./Code/ParametersClass.R")
 source("./Code/TwoChoiceTracker.R")
 source("./Code/XChoiceTracker.R")
+source("./Code/CentrophobismTracker.R")
 source("./Code/PairwiseInteractionTracker.R")
 source("./Code/DDropTracker.R")
 source("./Code/GeneralUtility.R")
@@ -65,6 +66,9 @@ TrackerClass.RawDataFrame <-
     }
     else if (parameters$TType == "PairwiseInteractionTracker") {
       data <- PairwiseInteractionTracker.ProcessPairwiseInteractionTracker(data)
+    }
+    else if (parameters$TType == "CentrophobismTracker") {
+      data <- CentrophobismTracker.ProcessCentrophobismTracker(data)
     }
     else{
       data<-Tracker.ProcessGeneralTracker(data)

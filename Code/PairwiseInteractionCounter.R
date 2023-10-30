@@ -8,8 +8,8 @@ require(tidyr)
 
 PairwiseInteractionCounter.ProcessPairwiseInteractionCounter<-function(counter){
   if (!is.null(counter$ExpDesign)) {
-    a <- "TrackingRegion" %in% colnames(tracker$ExpDesign)
-    b <- "Treatment" %in% colnames(tracker$ExpDesign)
+    a <- "TrackingRegion" %in% colnames(counter$ExpDesign)
+    b <- "Treatment" %in% colnames(counter$ExpDesign)
     f <- c(a, b)
     if (sum(f) < 2) {
       stop(

@@ -88,11 +88,12 @@ PlotX.XChoiceTracker<-function(tracker,range = c(0,0)){
   
   means <- ddply(rd, "Movement", summarise, Movement.mean = mean(RelX))
   xlims<-c(tracker$ROI[1]/-2,tracker$ROI[1]/2)*tracker$Parameters$mmPerPixel
-  ggplot(rd, aes(x = Xpos_mm,fill=Movement)) + xlab("XPos (mm)")+
+  x<-ggplot(rd, aes(x = Xpos_mm,fill=Movement)) + xlab("XPos (mm)")+
     geom_density(alpha = .3) + #alpha used for filling the density
     ggtitle(paste(" Tracker:",tracker$Name,sep="")) +
     geom_vline(data = means, aes(xintercept = Movement.mean,color=Movement),
                linetype = "longdash", size=1) + xlim(xlims)
+  print(x)
 }
 
 ## Functions that just catch misapplied higher functions

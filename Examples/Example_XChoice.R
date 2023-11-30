@@ -7,7 +7,7 @@
 
 rm(list=ls())
 ## Do one of the following two
-source("./Code/TwoChoiceFunctions.R")
+source("./Code/XChoiceFunctions.R")
 source("./Code/ArenaObject.R")
 ## or
 ##attach("ARENAFUNCTIONS")
@@ -52,8 +52,8 @@ Plot(results$Arena)
 ## If you would like to iterate through a series of subFolders and 
 ## save the results in each, run the batch analysis here
 
-#parentDirectory = "./Data/TwoChoiceTrackingData"
-parentDirectory = "./Data/TwoChoiceCountingData"
+#parentDirectory = "./Data/XChoiceTrackingData"
+parentDirectory = "./Data/XChoiceCountingData"
 ## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
 make.plots = TRUE
 batch.results<-ExecuteXChoiceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,make.plots)
@@ -61,11 +61,8 @@ batch.results<-ExecuteXChoiceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tTy
 write.table(batch.results,"clipboard",sep="\t",row.names=FALSE)
 
 ###############################################################################################
-## Plot the relevant data.  Plots will be output to PDF, not the ImageMagik requirement above.
+## Plot the relevant data.  Plots will be output to PDF, note the ImageMagik requirement above.
 ##PlotX(arena)
 ##PlotY(arena)
-PlotXY(arena)
+PlotX(results$Arena)
 PIPlots(arena)
-
-## Additional plots and outputs are available for individual trackers, such as
-TimeDependentPIPlots.TwoChoiceTracker(arena$Tracker_T6_0)

@@ -501,6 +501,7 @@ PlotX.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
     tt<-arena$Trackers[i,]
     t<-Arena.GetTracker(arena,tt)
     PlotX(t,range)
+    print(arena$Trackers[i,])
   }
   if(WriteToPDF==TRUE){
     #graphics.off()

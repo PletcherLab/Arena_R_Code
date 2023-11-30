@@ -496,8 +496,8 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
   Movement <- factor(tmp2)
   ylims <-
     c(tracker$ROI[1] / -2, tracker$ROI[1] / 2) * tracker$Parameters$mmPerPixel
-  print(
-    ggplot(rd, aes(Minutes, Xpos_mm),
+ 
+    x<-ggplot(rd, aes(Minutes, Xpos_mm),
            xlab = "Minutes", ylab = "XPos (mm)") +  ggtitle(paste("Tracker:", tracker$Name, sep =
                                                                     "")) +
       geom_rect(
@@ -510,10 +510,9 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
         ),
         show.legend = F
       ) +
-      scale_fill_manual(values = alpha(c("gray", "red"), .07)) +
+      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
       geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
-  )
-  
+    print(x)
 }
 
 PlotY.Tracker <- function(tracker, range = c(0, 0)) {
@@ -545,7 +544,7 @@ PlotY.Tracker <- function(tracker, range = c(0, 0)) {
         ),
         show.legend = F
       ) +
-      scale_fill_manual(values = alpha(c("gray", "red"), .07)) +
+      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
       geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
   )
 }

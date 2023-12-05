@@ -4,7 +4,7 @@ CentrophobismTracker.ProcessCentrophobismTracker <- function(tracker) {
     b <- "TrackingRegion" %in% colnames(tracker$ExpDesign)
     c <- "Treatment" %in% colnames(tracker$ExpDesign)
     d <- c(a, b, c)
-    if (sum(f) < 3) {
+    if (sum(d) < 3) {
       stop(
         "Experimental design file requires ObjectID,TrackingRegion, and Treatments columns."
       )
@@ -15,9 +15,11 @@ CentrophobismTracker.ProcessCentrophobismTracker <- function(tracker) {
   tracker
 }
 
+Get.Center.Distance<-function(RelX, RelY, CenterPoint){
+  
+}
 
-
-Get.Wall.Distance<-function(RelX,RelY,walls){
+Get.Wall.Distances<-function(RelX,RelY,walls){
   
   ## x is one row of wall data
   ## walls is a four element vector of left, right, top, bottom, wall values.
@@ -25,7 +27,7 @@ Get.Wall.Distance<-function(RelX,RelY,walls){
   b<-abs(RelX-walls[2])
   c<-abs(RelY-walls[3])
   d<-abs(RelY-walls[4])
-  
+
   tmp<-cbind(a,b,c,d)
   result<-apply(tmp,1,min)
   result
@@ -43,11 +45,10 @@ CentrophobismTracker.SetCentrophobismData<-function(tracker){
   
   walls<-c(x.left,x.right,y.top,y.bottom)
   
-  
-  tracker$RawData<-tracker$RawData%>% mutate(WallDist_mm=Get.Wall.Distance(RelX,RelY,walls))
+  tracker$RawData<-tracker$RawData%>% mutate(WallDist_mm=Get.Wall.Distances(RelX,RelY,walls), CenterDist_mm=sqrt(RelX*RelX+RelY*RelY))
   
   tracker$RawData$WallDist_mm<-tracker$RawData$WallDist_mm*tracker$Parameters$mmPerPixel
-  
+  tracker$RawData$CenterDist_mm<- tracker$RawData$CenterDist_mm*tracker$Parameters$mmPerPixel
   
   tracker
   
@@ -58,7 +59,8 @@ PlotXY.CentrophobismTracker <-
   function(tracker,
            range = c(0, 0),
            ShowQuality = FALSE,
-           PointSize = 0.75) {
+           PointSize = 0.75,
+           UseCenterDistance=TRUE) {
     rd <- Tracker.GetRawData(tracker, range)
     
     xlim <- c(min(rd$RelX), max(rd$RelX))
@@ -81,13 +83,25 @@ PlotXY.CentrophobismTracker <-
       c(tracker$ROI[1] / -2, tracker$ROI[1] / 2) * tracker$Parameters$mmPerPixel
     ylims <-
       c(tracker$ROI[2] / -2, tracker$ROI[2] / 2) * tracker$Parameters$mmPerPixel
-    x <- ggplot(rd, aes(Xpos_mm, Ypos_mm, color = WallDist_mm)) +
-      geom_point() +
-      coord_fixed() +
-      ggtitle(paste("Tracker:", tracker$Name, sep =
-                      "")) +
-      xlab("XPos (mm)") + ylab("YPos (mm)") + xlim(xlims) +
-      ylim(ylims)
+    
+    if(UseCenterDistance==TRUE){
+      x <- ggplot(rd, aes(Xpos_mm, Ypos_mm, color = CenterDist_mm)) +
+        geom_point() +
+        coord_fixed() +
+        ggtitle(paste("Tracker:", tracker$Name, sep =
+                        "")) +
+        xlab("XPos (mm)") + ylab("YPos (mm)") + xlim(xlims) +
+        ylim(ylims)  
+    }
+    else {
+      x <- ggplot(rd, aes(Xpos_mm, Ypos_mm, color = WallDist_mm)) +
+        geom_point() +
+        coord_fixed() +
+        ggtitle(paste("Tracker:", tracker$Name, sep =
+                        "")) +
+        xlab("XPos (mm)") + ylab("YPos (mm)") + xlim(xlims) +
+        ylim(ylims)
+    }
     print(x)
   }
 
@@ -118,13 +132,32 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   perc.WallDist_10mm<-sum(rd$WallDist_mm>10.0)/length(rd$WallDist_mm)
   perc.WallDist_15mm<-sum(rd$WallDist_mm>15.0)/length(rd$WallDist_mm)
   
+  AvgCenterDist<-mean(rd$CenterDist_mm)
+  perc.CenterDist_2mm<-sum(rd$CenterDist_mm<2.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_5mm<-sum(rd$CenterDist_mm<5.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_10mm<-sum(rd$CenterDist_mm<10.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_15mm<-sum(rd$CenterDist_mm<15.0)/length(rd$CenterDist_mm)
+  
+  
+  treatment<-NA
+  if(is.null(tracker$ExpDesign)==FALSE){
+  if(nrow(tracker$ExpDesign)==1){
+    treatment<-tracker$ExpDesign$Treatment[1]
+  }
+  }
   
   
   results <-
     data.frame(
       tracker$ID,
+      treatment,
       total.min,
       total.dist,
+      AvgCenterDist,
+      perc.CenterDist_2mm,
+      perc.CenterDist_5mm,
+      perc.CenterDist_10mm,
+      perc.CenterDist_15mm,
       AvgWallDist,
       perc.WallDist_2mm,
       perc.WallDist_5mm,
@@ -144,8 +177,14 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
     c(
       "ObjectID",
       "TrackingRegion",
+      "Treatment",
       "ObsMinutes",
       "TotalDist_mm",
+      "MeanCenterDist_mm",
+      "PercCenterDist2mm",
+      "PercCenterDist5mm",
+      "PercCenterDist10mm",
+      "PercCenterDist15mm",
       "MeanWallDist_mm",
       "PercWallDist2mm",
       "PercWallDist5mm",

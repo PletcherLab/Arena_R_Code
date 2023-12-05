@@ -22,14 +22,14 @@ p<-ParametersClass.CentrophobismTracker()
 ## If your data were collected with a live (i.e., FLIR) camera,
 ## then FPS should remain NA because the interframe time is 
 ## saved in the output file by DTrack.
-p<-Parameters.SetParameter(p,FPS=10)
+p<-Parameters.SetParameter(p,FPS=NA)
 
 ## Check out the parameters and ensure that they are appropriate.
 ## Notably, make sure the mmPerPixel value is correct for your setup.
 ## Note that sleep is not currently implemented.
 
-## This value is for the new CCD camera setup
-mm.per.pixel<-0.15
+## This value is for the new Obscura CCD camera setup
+mm.per.pixel<-0.17
 p<-Parameters.SetParameter(p,mmPerPixel=mm.per.pixel)
 
 ## change parameters as you need
@@ -43,10 +43,10 @@ p<-Parameters.SetParameter(p,mmPerPixel=mm.per.pixel)
 arena<-ArenaClass(p,dirname="Data/CentrophobismData")
 
 ## Basic movement information and region summaries can be obtained from
-Summarize(arena)
+results<-Summarize(arena)
 ## By default a summary output pdf files is produces as well (this can be turned off).
 
-## Currently (9/18/2023) this code requires the tracking region to be square to get distances
+## Currently (12/5/2023) this code requires the tracking region to be square to get distances
 ## from the wall
 
 ## To extract a specific chamber from the experiment
@@ -57,4 +57,14 @@ tracker<-Arena.GetTracker(arena,3)
 ## the output is sent to a pdf file by default (can be changed)
 ## but if you send a tracker it is not.
 PlotXY(arena)
+
+## ANOVA
+summary(aov(MeanCenterDist_mm~Treatment, data=results))
+
+## Or if you have some treatments and want to plot mean distances
+x <- ggplot(results, aes(Treatment, MeanCenterDist_mm, color = Treatment)) +
+  geom_boxplot() +
+  geom_jitter(size=3, alpha=0.9) 
+print(x)
+
 

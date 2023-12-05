@@ -127,16 +127,16 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   }
   
   AvgWallDist<-mean(rd$WallDist_mm)
-  perc.WallDist_2mm<-sum(rd$WallDist_mm>2.0)/length(rd$WallDist_mm)
-  perc.WallDist_5mm<-sum(rd$WallDist_mm>5.0)/length(rd$WallDist_mm)
-  perc.WallDist_10mm<-sum(rd$WallDist_mm>10.0)/length(rd$WallDist_mm)
-  perc.WallDist_15mm<-sum(rd$WallDist_mm>15.0)/length(rd$WallDist_mm)
+  perc.WallDist_2mm<-sum(rd$WallDist_mm<2.0)/length(rd$WallDist_mm)
+  perc.WallDist_5mm<-sum(rd$WallDist_mm<5.0)/length(rd$WallDist_mm)
+  perc.WallDist_10mm<-sum(rd$WallDist_mm<10.0)/length(rd$WallDist_mm)
+  perc.WallDist_15mm<-sum(rd$WallDist_mm<15.0)/length(rd$WallDist_mm)
   
   AvgCenterDist<-mean(rd$CenterDist_mm)
-  perc.CenterDist_2mm<-sum(rd$CenterDist_mm<2.0)/length(rd$CenterDist_mm)
-  perc.CenterDist_5mm<-sum(rd$CenterDist_mm<5.0)/length(rd$CenterDist_mm)
-  perc.CenterDist_10mm<-sum(rd$CenterDist_mm<10.0)/length(rd$CenterDist_mm)
-  perc.CenterDist_15mm<-sum(rd$CenterDist_mm<15.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_2mm<-sum(rd$CenterDist_mm>2.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_5mm<-sum(rd$CenterDist_mm>5.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_10mm<-sum(rd$CenterDist_mm>10.0)/length(rd$CenterDist_mm)
+  perc.CenterDist_15mm<-sum(rd$CenterDist_mm>15.0)/length(rd$CenterDist_mm)
   
   
   treatment<-NA

@@ -52,8 +52,8 @@ Plot(results$Arena)
 ## If you would like to iterate through a series of subFolders and 
 ## save the results in each, run the batch analysis here
 
-#parentDirectory = "./Data/XChoiceTrackingData"
-parentDirectory = "./Data/XChoiceCountingData"
+parentDirectory = "./Data/XChoiceTrackingData"
+#parentDirectory = "./Data/XChoiceCountingData"
 ## IF you want plots, set this to true.  Make sure ImageMagik is installed if so.  Plots take some time.
 make.plots = TRUE
 batch.results<-ExecuteXChoiceAnalysis.Batch(parentDirectory,fps,mm.per.pixel,tType,make.plots)

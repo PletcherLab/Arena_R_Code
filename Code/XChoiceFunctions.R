@@ -17,6 +17,7 @@ ExecuteXChoiceAnalysis.Batch<-function(parentFolder,fps,mmPerPixel,trackerType="
     }
     if(make.plots==TRUE){
       Plot(tmp$Arena,range)
+      PlotXY(tmp$Arena,range)
     }
   }
   if(index==2){

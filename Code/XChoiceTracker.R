@@ -78,6 +78,10 @@ Plot.XChoiceTracker<-function(tracker,range = c(0,0)){
 }
 
 PlotX.XChoiceTracker<-function(tracker,range = c(0,0)){  
+  PlotX.Tracker(tracker,range)
+}
+
+PlotX.XChoiceTracker.Old<-function(tracker,range = c(0,0)){  
   rd<-Tracker.GetRawData(tracker,range)
   tmp2<-rep("Moving",length(rd$X))
   tmp2[rd$Sleeping]<-"Sleeping"

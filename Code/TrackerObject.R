@@ -854,7 +854,9 @@ Tracker.GetRawData <- function(tracker, range = c(0, 0)) {
   rd
 }
 
-
+PlotDistanceFromCenter.Tracker <- function(tracker) {
+  cat("This function not available for this type of tracker")
+}
 
 Tracker.LastSampleData <- function(tracker) {
   tmp <- Tracker.GetRawData(tracker)

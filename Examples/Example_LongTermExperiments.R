@@ -9,6 +9,8 @@ CleanTrackers()
 ## You can define a generic tracker
 p<-ParametersClass()
 
+p<-ParametersClass.CentrophobismTracker()
+
 ## If you are analyzing a movie, then you need to specify the FPS
 ## that was used when the movie was recorded!
 ## If your data were collected with a live (i.e., FLIR) camera,
@@ -17,7 +19,7 @@ p<-ParametersClass()
 p<-Parameters.SetParameter(p,FPS=NA)
 
 ## This value is good for the Arenas
-mm.per.pixel<-0.017
+mm.per.pixel<-0.17
 
 p<-Parameters.SetParameter(p,mmPerPixel=mm.per.pixel)
 
@@ -40,6 +42,13 @@ dirname = "./Data/GeneralTrackingData"
 arena<-ArenaClass(p,dirname=dirname)
 summaries<-Summarize(arena)
 
+## Check for lots of not found or indescernible frames.
+QC.ArenaTracker(arena)
+
+## Maybe as a function of time
+QC.ArenaTracker(arena, range=c(100,2000))
+
+
 ## Because it takes a long time to read in and analyze data.
 ## Save the RFile.  This will allow you to avoid running the above lines again
 ## if you come back to the project to do more. 
@@ -52,6 +61,8 @@ write.table(summaries, "clipboard", sep="\t", row.names=FALSE)
 ## Plotting will take some time!
 ## Can use this to evaluate movement and death time estimates.
 PlotTotalDistance(arena)
+
+PlotDistanceFromCenter(arena)
 
 ## Beta attempt at estimating death times.
 deathtimes<-EstimateTimesOfDeath(arena)

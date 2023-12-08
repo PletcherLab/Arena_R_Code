@@ -116,3 +116,7 @@ PIPlots.XChoiceTracker<-function(tracker,range=c(0,0)){
 TimeDependentPIPlots.XChoiceTracker<-function(tracker,range=c(0,0)){
   cat("This function not available for this type of tracker")
 }
+
+PlotDistanceFromCenter.XChoiceTracker <- function(tracker) {
+  cat("This function not available for this type of tracker")
+}

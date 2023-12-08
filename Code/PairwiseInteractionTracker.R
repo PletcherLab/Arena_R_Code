@@ -187,3 +187,7 @@ PIPlots.PairwiseInteractionTracker<-function(tracker,range=c(0,0)){
 TimeDependentPIPlots.PairwiseInteractionTracker<-function(tracker,range=c(0,0)){
   cat("This function not available for this type of tracker")
 }
+
+PlotDistanceFromCenter.PairwiseInteractionTracker <- function(tracker) {
+  cat("This function not available for this type of tracker")
+}

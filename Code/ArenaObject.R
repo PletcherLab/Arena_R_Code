@@ -533,6 +533,25 @@ PlotTotalDistance.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   }
 }
 
+PlotDistanceFromCenter.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+  fname<-paste("./",arena$DataDir,"/",arena$Name,"_DistanceFromCenter.pdf",sep="")
+  tmp.list<-list()
+  if(WriteToPDF==TRUE) {
+    #pdf(fname,paper="USr",onefile=TRUE)
+    mypdf(fname,res = 600, height = 9, width = 11, units = "in")
+    par(mfrow=c(3,2))
+  }
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetTracker(arena,tt)
+    PlotDistanceFromCenter(t,range)
+  }
+  if(WriteToPDF==TRUE){
+    #graphics.off()
+    mydev.off(fname)
+  }
+}
+
 PlotX.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_XPlots.pdf",sep="")
   tmp.list<-list()

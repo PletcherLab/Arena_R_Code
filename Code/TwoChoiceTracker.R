@@ -210,3 +210,7 @@ GetPIData.TwoChoiceTracker<-function(tracker,range=c(0,0)){
     pd<-pd[pd$DataQuality=="High",]
   pd
 }
+
+PlotDistanceFromCenter.TwoChoiceChoiceTracker <- function(tracker) {
+  cat("This function not available for this type of tracker")
+}

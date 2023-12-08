@@ -240,7 +240,9 @@ TimeDependentPIPlots.DDropTracker<-function(tracker,range=c(0,0)){
   cat("This function not available for this type of tracker")
 }
 
-
+PlotDistanceFromCenter.DDropTracker <- function(tracker) {
+  cat("This function not available for this type of tracker")
+}
 ####################################
 ## Deprecated
 ####################################
@@ -258,3 +260,5 @@ ZeroDDropResults<-function(results){
   new.results<-list(PerRun=new.results,PerFly=results2)
   new.results
 }
+
+

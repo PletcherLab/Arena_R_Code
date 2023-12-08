@@ -228,3 +228,42 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   
   results
 }
+
+
+PlotDistanceFromCenter.CentrophobismTracker <-
+  function(tracker,
+           range = c(0, 0),
+           ShowQuality = FALSE) {
+    rd <- Tracker.GetRawData(tracker, range)
+    if (ShowQuality == FALSE) {
+      tmp2 <- rep("Moving", length(rd$RelX))
+      tmp2[rd$Sleeping] <- "Sleeping"
+      tmp2[rd$Resting] <- "Resting"
+      tmp2[rd$MicroMoving] <- "Micromoving"
+    }
+    else {
+      tmp2 <- rep("HighQuality", length(rd$RelX))
+      tmp2[rd$DataQuality != "High"] <- "LowQuality"
+    }
+    
+  
+    
+    Movement <- factor(tmp2)
+    
+    x <- ggplot(rd, aes(Minutes, CenterDist_mm),
+                xlab = "Minutes", ylab = "Distance From Center (mm)") +  ggtitle(paste("Tracker:", tracker$Name, sep =
+                                                                                   "")) +
+      geom_rect(
+        aes(
+          xmin = Minutes,
+          xmax = dplyr::lead(Minutes, default = 0),
+          ymin = -Inf,
+          ymax = Inf,
+          fill = factor(Indicator)
+        ),
+        show.legend = F
+      ) +
+      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
+      geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylab("Distance From Center (mm))") + geom_smooth(method = "loess", color="Purple")
+    print(x)
+  }

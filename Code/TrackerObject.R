@@ -20,7 +20,8 @@ TrackerClass.RawDataFrame <-
     tmp <- data
     tmp <-
       subset(tmp,
-             tmp$ObjectID == id$ObjectID & tmp$TrackingRegion == id$TrackingRegion)
+             tmp$ObjectID == id$ObjectID &
+               tmp$TrackingRegion == id$TrackingRegion)
     tmp <- droplevels(tmp)
     
     if (is.na(parameters$FPS)) {
@@ -42,12 +43,17 @@ TrackerClass.RawDataFrame <-
     tmp$DataQuality <- factor(tmp$DataQuality)
     
     if (!is.null(expDesign)) {
-      expDesign<-subset(expDesign,expDesign$ObjectID == id$ObjectID & expDesign$TrackingRegion == id$TrackingRegion)      
+      expDesign <-
+        subset(
+          expDesign,
+          expDesign$ObjectID == id$ObjectID &
+            expDesign$TrackingRegion == id$TrackingRegion
+        )
     }
-    name<-paste(id$TrackingRegion,"_",id$ObjectID,sep="")
+    name <- paste(id$TrackingRegion, "_", id$ObjectID, sep = "")
     data = list(
       ID = id,
-      Name=name,
+      Name = name,
       ROI = roisize,
       CountingROI = theCountingROI,
       Parameters = parameters,
@@ -65,13 +71,14 @@ TrackerClass.RawDataFrame <-
       data <- DDropTracker.ProcessDDropTracker(data)
     }
     else if (parameters$TType == "PairwiseInteractionTracker") {
-      data <- PairwiseInteractionTracker.ProcessPairwiseInteractionTracker(data)
+      data <-
+        PairwiseInteractionTracker.ProcessPairwiseInteractionTracker(data)
     }
     else if (parameters$TType == "CentrophobismTracker") {
       data <- CentrophobismTracker.ProcessCentrophobismTracker(data)
     }
     else{
-      data<-Tracker.ProcessGeneralTracker(data)
+      data <- Tracker.ProcessGeneralTracker(data)
     }
     
     ## The class is done, now can add default operations to it
@@ -83,15 +90,16 @@ TrackerClass.RawDataFrame <-
     data
   }
 
-Tracker.ProcessGeneralTracker<-function(tracker){
+Tracker.ProcessGeneralTracker <- function(tracker) {
   class(tracker) <- c("Tracker", class(tracker))
   tracker
 }
 
 Tracker.Calculate.MovementTypes <- function(tracker) {
-  tnames <- c(names(tracker$RawData), "Walking", "MicroMoving", "Resting")
+  tnames <-
+    c(names(tracker$RawData), "Walking", "MicroMoving", "Resting")
   new.data.frame <-
-    data.frame(tracker$RawData[1, ], c(TRUE), c(TRUE), c(TRUE)) # Temp holder
+    data.frame(tracker$RawData[1,], c(TRUE), c(TRUE), c(TRUE)) # Temp holder
   names(new.data.frame) <- tnames
   tdata <- tracker$RawData
   micro <-
@@ -106,7 +114,7 @@ Tracker.Calculate.MovementTypes <- function(tracker) {
   names(tdata) <- tnames
   new.data.frame <- rbind(new.data.frame, tdata)
   
-  new.data.frame <- new.data.frame[-1, ]
+  new.data.frame <- new.data.frame[-1,]
   tracker$RawData <- new.data.frame
   tracker
 }
@@ -124,7 +132,7 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
       "ModifiedSpeed_mm_s"
     )
   new.data.frame <-
-    data.frame(tracker$RawData[1, ], c(1), c(1), c(1), c(1), c(1), c(1), c(1)) # Temp holder
+    data.frame(tracker$RawData[1,], c(1), c(1), c(1), c(1), c(1), c(1), c(1)) # Temp holder
   names(new.data.frame) <- tnames
   tdata <- tracker$RawData
   tmp <- length(tdata$X)
@@ -138,7 +146,8 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
     delta.sec <- c(0, (min2 - min1) * 60)
     delta.x.mm <- c(0, x2 - x1) * tracker$Parameters$mmPerPixel
     delta.y.mm <- c(0, y2 - y1) * tracker$Parameters$mmPerPixel
-    dist.mm <- sqrt(delta.x.mm * delta.x.mm + delta.y.mm * delta.y.mm)
+    dist.mm <-
+      sqrt(delta.x.mm * delta.x.mm + delta.y.mm * delta.y.mm)
     
     speed <- dist.mm / delta.sec
     speed[1] <- 0
@@ -170,7 +179,7 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
     names(tdata) <- tnames
     new.data.frame <- rbind(new.data.frame, tdata)
     
-    new.data.frame <- new.data.frame[-1, ]
+    new.data.frame <- new.data.frame[-1,]
     tracker$RawData <- new.data.frame
   }
   tracker
@@ -195,7 +204,8 @@ Tracker.Calculate.Sleep <- function(tracker) {
   ## blow up in the conversion of distance/frame to distance/sec.
   theRuns <- rle(t1$Resting)
   cumMinRuns <- t1$Minutes[cumsum(theRuns$lengths)]
-  RunDurationMin <- cumMinRuns - c(0, cumMinRuns[-length(cumMinRuns)])
+  RunDurationMin <-
+    cumMinRuns - c(0, cumMinRuns[-length(cumMinRuns)])
   LongEnoughRuns <- RunDurationMin > p$Sleep.Threshold.Min
   LongEnoughSleepRuns <- LongEnoughRuns & as.logical(theRuns$values)
   sleep <- rep(LongEnoughSleepRuns, theRuns$lengths)
@@ -312,7 +322,7 @@ Summarize.Tracker <- function(tracker,
   
   ## Now get the summary on the rest
   total.min <- rd$Minutes[nrow(rd)] - rd$Minutes[1]
-  total.frames<-nrow(rd)
+  total.frames <- nrow(rd)
   total.dist <-
     (rd$TotalDistance[nrow(rd)] - rd$TotalDistance[1]) * tracker$Parameters$mmPerPixel
   perc.Sleeping <- sum(rd$Sleeping) / length(rd$Sleeping)
@@ -389,24 +399,23 @@ Summarize.Tracker <- function(tracker,
 }
 
 
-QC.Tracker<- function(tracker,
-                      range = c(0, 0),
-                      ShowPlot = TRUE){
-  
+QC.Tracker <- function(tracker,
+                       range = c(0, 0),
+                       ShowPlot = TRUE) {
   rd <- Tracker.GetRawData(tracker, range)
   total.min <- rd$Minutes[nrow(rd)] - rd$Minutes[1]
-  start.time<-rd$Time[1]
-  end.time<-rd$Time[length(rd$Time)]
-  quality<-rd$DataQuality
-  total.frames<-length(quality)
-  high<-sum(quality=="High")
-  perc.high<-high/total.frames
- 
-  indis<-sum(quality=="Indiscernible")
-  perc.indis<-indis/total.frames
+  start.time <- rd$Time[1]
+  end.time <- rd$Time[length(rd$Time)]
+  quality <- rd$DataQuality
+  total.frames <- length(quality)
+  high <- sum(quality == "High")
+  perc.high <- high / total.frames
   
-  notfound<-sum(quality=="NotFound")
-  perc.notfound<-notfound/total.frames
+  indis <- sum(quality == "Indiscernible")
+  perc.indis <- indis / total.frames
+  
+  notfound <- sum(quality == "NotFound")
+  perc.notfound <- notfound / total.frames
   
   results <-
     data.frame(
@@ -442,12 +451,54 @@ QC.Tracker<- function(tracker,
   results
 }
 
-Plot.Tracker<-function(tracker,
-                     range = c(0, 0),
-                     ShowQuality = FALSE,
-                     PointSize = 0.75){
-  PlotXY.Tracker(tracker,range,ShowQuality,PointSize)
+Plot.Tracker <- function(tracker,
+                         range = c(0, 0),
+                         ShowQuality = FALSE,
+                         PointSize = 0.75) {
+  PlotXY.Tracker(tracker, range, ShowQuality, PointSize)
 }
+
+
+PlotTotalDistance.Tracker <-
+  function(tracker,
+           range = c(0, 0),
+           ShowQuality = FALSE) {
+    rd <- Tracker.GetRawData(tracker, range)
+    if (ShowQuality == FALSE) {
+      tmp2 <- rep("Moving", length(rd$RelX))
+      tmp2[rd$Sleeping] <- "Sleeping"
+      tmp2[rd$Resting] <- "Resting"
+      tmp2[rd$MicroMoving] <- "Micromoving"
+    }
+    else {
+      tmp2 <- rep("HighQuality", length(rd$RelX))
+      tmp2[rd$DataQuality != "High"] <- "LowQuality"
+    }
+    
+    
+    CalculatedDistance.mm<-cumsum(rd$Dist_mm)
+    
+    Movement <- factor(tmp2)
+    ylims <-
+      c(min(CalculatedDistance.mm),max(CalculatedDistance.mm))
+    
+    x <- ggplot(rd, aes(Minutes, CalculatedDistance.mm),
+                xlab = "Minutes", ylab = "Total Distance (mm)") +  ggtitle(paste("Tracker:", tracker$Name, sep =
+                                                                         "")) +
+      geom_rect(
+        aes(
+          xmin = Minutes,
+          xmax = dplyr::lead(Minutes, default = 0),
+          ymin = -Inf,
+          ymax = Inf,
+          fill = factor(Indicator)
+        ),
+        show.legend = F
+      ) +
+      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
+      geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylim(ylims) + ylab("Total Distance (mm)")
+    print(x)
+  }
 
 PlotXY.Tracker <-
   function(tracker,
@@ -496,23 +547,23 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
   Movement <- factor(tmp2)
   ylims <-
     c(tracker$ROI[1] / -2, tracker$ROI[1] / 2) * tracker$Parameters$mmPerPixel
- 
-    x<-ggplot(rd, aes(Minutes, Xpos_mm),
-           xlab = "Minutes", ylab = "XPos (mm)") +  ggtitle(paste("Tracker:", tracker$Name, sep =
-                                                                    "")) +
-      geom_rect(
-        aes(
-          xmin = Minutes,
-          xmax = dplyr::lead(Minutes, default = 0),
-          ymin = -Inf,
-          ymax = Inf,
-          fill = factor(Indicator)
-        ),
-        show.legend = F
-      ) +
-      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
-      geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
-    print(x)
+  
+  x <- ggplot(rd, aes(Minutes, Xpos_mm),
+              xlab = "Minutes", ylab = "XPos (mm)") +  ggtitle(paste("Tracker:", tracker$Name, sep =
+                                                                       "")) +
+    geom_rect(
+      aes(
+        xmin = Minutes,
+        xmax = dplyr::lead(Minutes, default = 0),
+        ymin = -Inf,
+        ymax = Inf,
+        fill = factor(Indicator)
+      ),
+      show.legend = F
+    ) +
+    scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
+    geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
+  print(x)
 }
 
 PlotY.Tracker <- function(tracker, range = c(0, 0)) {
@@ -525,11 +576,16 @@ PlotY.Tracker <- function(tracker, range = c(0, 0)) {
   Movement <- factor(tmp2)
   ylims <-
     c(tracker$ROI[2] / -2, tracker$ROI[2] / 2) * tracker$Parameters$mmPerPixel
-  if(is.null(tracker$ExpDesign)){
-    title<-paste("Tracker:", tracker$Name, sep ="")
+  if (is.null(tracker$ExpDesign)) {
+    title <- paste("Tracker:", tracker$Name, sep = "")
   }
   else{
-    title<-paste("Tracker: ", tracker$Name, "  Treatment: ",tracker$ExpDesign$Treatment[1],sep ="")
+    title <-
+      paste("Tracker: ",
+            tracker$Name,
+            "  Treatment: ",
+            tracker$ExpDesign$Treatment[1],
+            sep = "")
   }
   print(
     ggplot(rd, aes(Minutes, Ypos_mm),
@@ -544,7 +600,9 @@ PlotY.Tracker <- function(tracker, range = c(0, 0)) {
         ),
         show.legend = F
       ) +
-      scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
+      scale_fill_manual(values = alpha(c(
+        "gray", "red", "red"
+      ), .07)) +
       geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
   )
 }
@@ -593,7 +651,8 @@ AnalyzeTransitions.Tracker <-
     
     tmp <- rle(as.character(data$CountingRegion))
     cumMinRuns <- data$Minutes[cumsum(tmp$lengths)]
-    RunDurationMin <- cumMinRuns - c(0, cumMinRuns[-length(cumMinRuns)])
+    RunDurationMin <-
+      cumMinRuns - c(0, cumMinRuns[-length(cumMinRuns)])
     tmp <- data.frame(tmp$lengths, tmp$values)
     names(tmp) <- c("RunDurationFrames", "Region")
     
@@ -604,8 +663,9 @@ AnalyzeTransitions.Tracker <-
     result$TMatrix <- mc
     if (ShowPlot == TRUE) {
       gg <- result$Runs
-      x <- ggplot(gg, aes(RunDurationMin, color = Region, Fill = Region)) +
-        geom_bar() + scale_x_log10() + facet_wrap( ~ Region) + xlab("Duration (min)") +
+      x <-
+        ggplot(gg, aes(RunDurationMin, color = Region, Fill = Region)) +
+        geom_bar() + scale_x_log10() + facet_wrap(~ Region) + xlab("Duration (min)") +
         ylab("Count") + ggtitle(paste(
           " Tracker:",
           tracker$ID$TrackingRegion,
@@ -714,46 +774,51 @@ GetQuartileXPositions.Tracker <-
   }
 
 
-ReportDuration.Tracker<-function(tracker){
-  result<-data.frame(matrix(c(0,"None",0,0),nrow=1))
-  names(result)<-c("ObjectID","TrackingRegion","StartTime","Duration")  
-  index<-1
-    t<-tracker
-    tmp<-t$RawData
-    if(nrow(tmp)<2) {
-      start<-NA
-      duration<-NA
-    }
-    else {
-      start<-tmp$Minutes[1]
-      duration<-tmp$Minutes[length(tmp$Minutes)]-start
-    }
-    result[index,]<-c(tracker$ID$ObjectID,tracker$ID$TrackingRegion,start,duration)
-    index<-index+1
+ReportDuration.Tracker <- function(tracker) {
+  result <- data.frame(matrix(c(0, "None", 0, 0), nrow = 1))
+  names(result) <-
+    c("ObjectID", "TrackingRegion", "StartTime", "Duration")
+  index <- 1
+  t <- tracker
+  tmp <- t$RawData
+  if (nrow(tmp) < 2) {
+    start <- NA
+    duration <- NA
+  }
+  else {
+    start <- tmp$Minutes[1]
+    duration <- tmp$Minutes[length(tmp$Minutes)] - start
+  }
+  result[index, ] <-
+    c(tracker$ID$ObjectID,
+      tracker$ID$TrackingRegion,
+      start,
+      duration)
+  index <- index + 1
   result
 }
 
-GetRuns.Tracker<-function(tracker){
-  data<-Tracker.GetRawData(tracker)
-  tmp<-rle(as.character(data$CountingRegion))
-  tmp<-data.frame(tmp$lengths,tmp$values)
-  names(tmp)<-c("RunDurationFrames","CountingRegion")
-  RunDurationMin<-tmp$RunDurationFrames/tracker$Parameters$FPS/60
-  CumRunDurMin<-cumsum(RunDurationMin)
-  StartTime<-c(0,CumRunDurMin)
-  StartTime<-StartTime[-(length(StartTime))]
-  EndTime<-CumRunDurMin
-  tmp<-data.frame(tmp,RunDurationMin,StartTime,EndTime)
+GetRuns.Tracker <- function(tracker) {
+  data <- Tracker.GetRawData(tracker)
+  tmp <- rle(as.character(data$CountingRegion))
+  tmp <- data.frame(tmp$lengths, tmp$values)
+  names(tmp) <- c("RunDurationFrames", "CountingRegion")
+  RunDurationMin <- tmp$RunDurationFrames / tracker$Parameters$FPS / 60
+  CumRunDurMin <- cumsum(RunDurationMin)
+  StartTime <- c(0, CumRunDurMin)
+  StartTime <- StartTime[-(length(StartTime))]
+  EndTime <- CumRunDurMin
+  tmp <- data.frame(tmp, RunDurationMin, StartTime, EndTime)
   tmp
 }
 
-GetFirstRegionDuration.Tracker<-function(tracker,time_min){
+GetFirstRegionDuration.Tracker <- function(tracker, time_min) {
   ## This function returns the duration info
   ## for the first duration >= time_min
-  tmp<-GetRuns.Tracker(tracker)
-  tmp2<-tmp[tmp$CountingRegion!="None",]
-  tmp2<-tmp2[tmp2$RunDurationMin>=time_min,]
-  tmp2[1,]
+  tmp <- GetRuns.Tracker(tracker)
+  tmp2 <- tmp[tmp$CountingRegion != "None", ]
+  tmp2 <- tmp2[tmp2$RunDurationMin >= time_min, ]
+  tmp2[1, ]
 }
 
 
@@ -777,14 +842,14 @@ TimeDependentPIPlots.Tracker <- function(tracker, range = c(0, 0)) {
 Tracker.GetRawData <- function(tracker, range = c(0, 0)) {
   rd <- tracker$RawData
   if (sum(range) != 0) {
-    rd <- rd[(rd$Minutes > range[1]) & (rd$Minutes < range[2]), ]
+    rd <- rd[(rd$Minutes > range[1]) & (rd$Minutes < range[2]),]
   }
   ## Filter out unwanted data
   if (tracker$Parameters$Filter.Sleep == TRUE) {
-    rd <- rd[rd$Sleeping == 0, ]
+    rd <- rd[rd$Sleeping == 0,]
   }
   if (tracker$Parameters$Filter.Tracker.Error == 1) {
-    rd <- rd[rd$DataQuality == "High", ]
+    rd <- rd[rd$DataQuality == "High",]
   }
   rd
 }
@@ -794,9 +859,9 @@ Tracker.GetRawData <- function(tracker, range = c(0, 0)) {
 Tracker.LastSampleData <- function(tracker) {
   tmp <- Tracker.GetRawData(tracker)
   nr <- nrow(tmp)
-  tmp[nr, ]
+  tmp[nr,]
 }
 Tracker.FirstSampleData <- function(tracker) {
   tmp <- Tracker.GetRawData(tracker)
-  tmp[1, ]
+  tmp[1,]
 }

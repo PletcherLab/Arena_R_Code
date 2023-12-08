@@ -149,6 +149,7 @@ ArenaTrackerClass<-function(parameters,dirname="Data"){
   if(nrow(trackers)>0){
     for(i in 1:nrow(trackers)){
       nm<-paste("Tracker",trackers[i,2],trackers[i,1],sep="_")
+      print(nm)
       roinm<-trackers$TrackingRegion[i]
       theROI<-c(roi$Width[roi$Name==roinm],roi$Height[roi$Name==roinm])
       theCountingROI<-roi$Name[roi$Type=="Counting"]
@@ -488,6 +489,49 @@ PlotXY.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   }
 }
 
+
+EstimateTimesOfDeath<-function(arena){
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetTracker(arena,tt)
+    x<-which(t$RawData$Sleeping==FALSE)
+    min<-t$RawData[x[length(x)],"Minutes"]
+    if(i==1){
+      results<-data.frame(tt,min)
+      names(results)<-c("ObjectID","TrackingRegion","DeathTime_min")
+    }
+    else {
+      tmp<-data.frame(tt,min)
+      names(tmp)<-c("ObjectID","TrackingRegion","DeathTime_min")
+      results<-rbind(results,tmp)
+    }
+  }
+  
+  hours<-results$DeathTime_min/60
+  results<-cbind(results,hours)
+  names(results)<-c("ObjectID","TrackingRegion","DeathTime_min","DeathTime_hour")
+  results
+}
+
+
+PlotTotalDistance.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
+  fname<-paste("./",arena$DataDir,"/",arena$Name,"_Distance.pdf",sep="")
+  tmp.list<-list()
+  if(WriteToPDF==TRUE) {
+    #pdf(fname,paper="USr",onefile=TRUE)
+    mypdf(fname,res = 600, height = 9, width = 11, units = "in")
+    par(mfrow=c(3,2))
+  }
+  for(i in 1:nrow(arena$Trackers)){
+    tt<-arena$Trackers[i,]
+    t<-Arena.GetTracker(arena,tt)
+    PlotTotalDistance(t,range)
+  }
+  if(WriteToPDF==TRUE){
+    #graphics.off()
+    mydev.off(fname)
+  }
+}
 
 PlotX.Arena<-function(arena,range=c(0,0),WriteToPDF=TRUE){
   fname<-paste("./",arena$DataDir,"/",arena$Name,"_XPlots.pdf",sep="")

@@ -46,6 +46,8 @@ arena<-ArenaClass(p,dirname="Data/CentrophobismData")
 results<-Summarize(arena)
 ## By default a summary output pdf files is produces as well (this can be turned off).
 
+write.table(results, "clipboard", sep="\t", row.names=FALSE)
+
 ## Currently (12/5/2023) this code requires the tracking region to be square to get distances
 ## from the wall
 

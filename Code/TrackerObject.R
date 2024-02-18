@@ -562,7 +562,7 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
       show.legend = F
     ) +
     scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
-    geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
+    geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylim(ylims)
   print(x)
 }
 
@@ -603,7 +603,7 @@ PlotY.Tracker <- function(tracker, range = c(0, 0)) {
       scale_fill_manual(values = alpha(c(
         "gray", "red", "red"
       ), .07)) +
-      geom_line(aes(group = 1, color = Movement), size = 2) + ylim(ylims)
+      geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylim(ylims)
   )
 }
 

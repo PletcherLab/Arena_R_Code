@@ -96,7 +96,7 @@ PlotX.XChoiceTracker.Old<-function(tracker,range = c(0,0)){
     geom_density(alpha = .3) + #alpha used for filling the density
     ggtitle(paste(" Tracker:",tracker$Name,sep="")) +
     geom_vline(data = means, aes(xintercept = Movement.mean,color=Movement),
-               linetype = "longdash", size=1) + xlim(xlims)
+               linetype = "longdash", linewidth=1) + xlim(xlims)
   print(x)
 }
 

@@ -31,9 +31,9 @@ Summarize.DDropTracker<-function(tracker,range=c(0,0),ShowPlot=FALSE){
   totalYdist<-Tracker.GetTotalYDist(tracker,range)
   totalUpdist<-Tracker.GetTotalUpDist(tracker,range)
   
-  avgspeed<-mean(rd$Speed, na.rm=TRUE)
+  avgspeed<-mean(rd$Speed_mm_s, na.rm=TRUE)
   
-  tmp<-sort(rd$Speed)
+  tmp<-sort(rd$Speed_mm_s)
   tmp<-tmp[(length(tmp)*0.9):length(tmp)]
   
   avgTop10speed<-mean(tmp, na.rm=TRUE)
@@ -55,11 +55,11 @@ Summarize.DDropTracker<-function(tracker,range=c(0,0),ShowPlot=FALSE){
   total.sec<-total.min*60
   if(is.null(tracker$ExpDesign)){
     results<-data.frame(tracker$ID,total.sec,firstTimeSeen,firstSeenY,firstUps[1],firstUps[2],firstUps[3],firstUps[4],maxY,t(maxYs),totalYdist,totalUpdist,avgspeed,avgTop10speed,totaldist,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,range[1],range[2])
-    names(results)<-c("ObjectID","TrackingRegion","ObsSeconds","SecFirstSeen","FirstSeenY_mm","SecTo25","SecTo50", "SecTo75", "SecTo90","MaxY_mm",max.labels,"TotalYDist_mm","TotalUpDist_mm","AvgSpeed","AvgTop10Speed","TotalDist_mm","PercSleeping","PercWalking","PercMicroMoving","PercResting","StartMin","EndMin")
+    names(results)<-c("ObjectID","TrackingRegion","ObsSeconds","SecFirstSeen","FirstSeenY_mm","SecTo25","SecTo50", "SecTo75", "SecTo90","MaxY_mm",max.labels,"TotalYDist_mm","TotalUpDist_mm","AvgSpeed_mm_s","AvgTop10Speed","TotalDist_mm","PercSleeping","PercWalking","PercMicroMoving","PercResting","StartMin","EndMin")
   }
   else{
     results<-data.frame(tracker$ID,tracker$ExpDesign$Fly,tracker$ExpDesign$Treatment,total.sec,firstTimeSeen,firstSeenY,firstUps[1],firstUps[2],firstUps[3],firstUps[4],maxY,t(maxYs),totalYdist,totalUpdist,avgspeed,avgTop10speed,totaldist,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,range[1],range[2])
-    names(results)<-c("ObjectID","TrackingRegion","Fly","Treatment","ObsSeconds","SecFirstSeen","FirstSeenY_mm","SecTo25","SecTo50", "SecTo75", "SecTo90","MaxY_mm",max.labels,"TotalYDist_mm","TotalUpDist_mm","AvgSpeed","AvgTop10Speed","TotalDist_mm","PercSleeping","PercWalking","PercMicroMoving","PercResting","StartMin","EndMin")
+    names(results)<-c("ObjectID","TrackingRegion","Fly","Treatment","ObsSeconds","SecFirstSeen","FirstSeenY_mm","SecTo25","SecTo50", "SecTo75", "SecTo90","MaxY_mm",max.labels,"TotalYDist_mm","TotalUpDist_mm","AvgSpeed_mm_s","AvgTop10Speed","TotalDist_mm","PercSleeping","PercWalking","PercMicroMoving","PercResting","StartMin","EndMin")
   }
   results
 }

@@ -103,12 +103,12 @@ Tracker.Calculate.MovementTypes <- function(tracker) {
   names(new.data.frame) <- tnames
   tdata <- tracker$RawData
   micro <-
-    tdata$ModifiedSpeed_mm_s > tracker$Parameters$MicroMove.mm.sec[1] &
-    tdata$ModifiedSpeed_mm_s < tracker$Parameters$MicroMove.mm.sec[2]
+    tdata$Speed_mm_s > tracker$Parameters$MicroMove.mm.sec[1] &
+    tdata$Speed_mm_s < tracker$Parameters$MicroMove.mm.sec[2]
   walking <-
-    tdata$ModifiedSpeed_mm_s >  tracker$Parameters$Walking.mm.sec
+    tdata$Speed_mm_s >  tracker$Parameters$Walking.mm.sec
   rest <-
-    tdata$ModifiedSpeed_mm_s < tracker$Parameters$MicroMove.mm.sec[1]
+    tdata$Speed_mm_s < tracker$Parameters$MicroMove.mm.sec[1]
   
   tdata <- data.frame(tdata, walking, micro, rest)
   names(tdata) <- tnames
@@ -120,6 +120,40 @@ Tracker.Calculate.MovementTypes <- function(tracker) {
 }
 
 Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
+  tdata <- tracker$RawData
+  tdata<-tdata %>% group_by(TrackingRegion) %>%
+    mutate(Xpos_mm = RelX * tracker$Parameters$mmPerPixel,
+           Ypos_mm = RelY * tracker$Parameters$mmPerPixel,
+           DeltaX_mm = c(0,diff(Xpos_mm)),
+           DeltaY_mm = c(0,diff(Ypos_mm)),
+           Dist_mm = sqrt(DeltaX_mm * DeltaX_mm + DeltaY_mm * DeltaY_mm),
+           DeltaSec = c(0,diff(Minutes)*60)
+    )
+  
+  ## Try to focus on distance moved over a window specified in the parameters object.
+  ## The window size is based on average, but actual speed uses exact time elapsed.
+  window.size<-round(1/mean(diff(tdata$Minutes)*60))*tracker$Parameters$Speed.Window.sec
+  if(window.size<=1) {
+    tdata<-tdata %>%
+      group_by(TrackingRegion) %>%
+      mutate(Speed_mm_s=Dist_mm/DeltaSec)
+  }
+  else {
+    tdata<-tdata %>%
+      group_by(TrackingRegion) %>%
+      mutate(DistWindow_mm=rollapply(Dist_mm,window.size,sum,align='right', partial=TRUE, fill=NA),
+             DeltaSecWindow=rollapply(DeltaSec,window.size,sum,align='right', partial=TRUE, fill=NA),
+             Speed_mm_s = DistWindow_mm/DeltaSecWindow)
+  }
+  
+  tracker$RawData <- tdata
+  
+  tracker
+}
+
+
+
+Tracker.Calculate.SpeedsAndFeeds.Old <- function(tracker) {
   tnames <-
     c(
       names(tracker$RawData),
@@ -155,7 +189,7 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
     ## For more complex speed transformations, add a function here
     if (tracker$Parameters$Smooth.Speed.Data) {
       ttt <- ksmooth(tdata$Minutes, speed, x.points = tdata$Minutes)$y
-      modifiedSpeed_mm_s <- ttt
+      modifiedSpeed_mm_s <- speed
       
     }
     else {
@@ -230,65 +264,6 @@ CleanTrackers <- function() {
   rm(list = tmp, pos = 1)
 }
 
-Tracker.ChangeParameterObject <- function(tracker, newP) {
-  p <- tracker$Parameters
-  fsleep.flag <- FALSE
-  ferror.flag <- FALSE
-  sthreshold.flag <- FALSE
-  ttype.flag <- FALSE
-  pixel.flag <- FALSE
-  walking.flag <- FALSE
-  micromove.flag <- FALSE
-  
-  tmp.O <- options()
-  options(warn = -1)
-  tracker$Parameters <- newP
-  ## Change only those that are listed
-  if (p$Filter.Sleep != newP$Filter.Sleep) {
-    flseep.flag <- TRUE
-  }
-  if (p$Filter.Tracker.Error != newP$Filter.Tracker.Error) {
-    ferror.flag <- TRUE
-  }
-  if (p$Sleep.Threshold.Distance.mm != newP$Sleep.Threshold.Distance.mm) {
-    sthreshold.flag <- TRUE
-  }
-  if (p$Sleep.Threshold.Min != newP$Sleep.Threshold.Min) {
-    sthreshold.flag <- TRUE
-  }
-  if (sum(p$MicroMove.mm.sec != newP$MicroMove.mm.sec) > 0) {
-    micromove.flag <- TRUE
-  }
-  
-  if (p$Walking.mm.sec != newP$Walking.mm.sec) {
-    walking.flag <- TRUE
-  }
-  if (p$TType != newP$TType) {
-    ttype.flag <- TRUE
-  }
-  
-  ## Now update the stats needed
-  if (fsleep.flag == TRUE) {
-    tracker <- Tracker.Calculate.Sleep(tracker)
-  }
-  else if (ferror.flag == TRUE) {
-    tracker <- Tracker.Calculate.SpeedsAndFeeds(tracker)
-    tracker <- Tracker.Calculate.MovementTypes(tracker)
-    tracker <- Tracker.Calculate.Sleep(tracker)
-  }
-  else if (sthreshold.flag == TRUE) {
-    tracker <- Tracker.Calculate.Sleep(tracker)
-  }
-  else if (sum(c(micromove.flag, walking.flag)) > 0) {
-    tracker <- Tracker.Calculate.MovementTypes(tracker)
-    tracker <- Tracker.Calculate.Sleep(tracker)
-  }
-  else if (ttype.flag == TRUE) {
-    cat("Do something here")
-  }
-  options(tmp.O)
-  tracker
-}
 
 Tracker.GetType <- function(tracker) {
   tracker$Parameters$TType
@@ -330,7 +305,7 @@ Summarize.Tracker <- function(tracker,
   perc.MicroMoving <- sum(rd$MicroMoving) / length(rd$MicroMoving)
   perc.Resting <- sum(rd$Resting) / length(rd$Resting)
   
-  avg.speed <- mean(rd$ModifiedSpeed_mm_s)
+  avg.speed <- mean(rd$Speed_mm_s)
   
   regions <- tracker$CountingROI
   r.tmp <- matrix(rep(-1, length(regions)), nrow = 1)
@@ -545,6 +520,7 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
   tmp2[rd$MicroMoving] <- "Micromoving"
   
   Movement <- factor(tmp2)
+  print(rd)
   ylims <-
     c(tracker$ROI[1] / -2, tracker$ROI[1] / 2) * tracker$Parameters$mmPerPixel
   
@@ -562,7 +538,9 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
       show.legend = F
     ) +
     scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
-    geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylim(ylims)
+    geom_line(linewidth = 0.5) + 
+    geom_point(aes(group = 1, color = Movement), size = 2)+
+    ylim(ylims)
   print(x)
 }
 
@@ -603,7 +581,9 @@ PlotY.Tracker <- function(tracker, range = c(0, 0)) {
       scale_fill_manual(values = alpha(c(
         "gray", "red", "red"
       ), .07)) +
-      geom_line(aes(group = 1, color = Movement), linewidth = 2) + ylim(ylims)
+      geom_line(linewidth = 0.5) + 
+      geom_point(aes(group = 1, color = Movement), size = 2)+
+      ylim(ylims)
   )
 }
 

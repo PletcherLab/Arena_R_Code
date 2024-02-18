@@ -8,12 +8,12 @@ ParametersClass=function(){
   mmPerPixel=0.056
   MicroMove.mm.sec<-c(0.2,2.0)
   Walking.mm.sec<-2.0
-  Smooth.Speed.Data<-TRUE
+  Speed.Window.sec<-1
   DDropDivision.sec<-1
   ObservationTime.sec<-15
   FPS=NA
   TType="ArenaTracker"
-  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
+  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Speed.Window.sec=Speed.Window.sec,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
             Sleep.Threshold.Distance.mm=Sleep.Threshold.Distance.mm,MicroMove.mm.sec=MicroMove.mm.sec,Walking.mm.sec=Walking.mm.sec,TType=TType)
   class(tmp)="ParametersObject"
   tmp
@@ -23,7 +23,7 @@ ParametersClass=function(){
 
 ## change the initial values using this function
 Parameters.SetParameter<-function(p,mmPerPixel=NA,Filter.Sleep=NA,Filter.Tracker.Error=NA, Sleep.Threshold.Min=NA, 
-                                  Sleep.Threshold.Distance.mm=NA,MicroMove.mm.sec=NA,Walking.mm.sec=NA,TType=NA, Smooth.Speed.Data=NA, FPS=NA,
+                                  Sleep.Threshold.Distance.mm=NA,MicroMove.mm.sec=NA,Walking.mm.sec=NA,TType=NA, Speed.Window.sec=NA, FPS=NA,
                                   ObservationTime.sec=NA,DDropDivision.sec=NA){
   tmp.O<-options()
   options(warn=-1)
@@ -32,8 +32,8 @@ Parameters.SetParameter<-function(p,mmPerPixel=NA,Filter.Sleep=NA,Filter.Tracker
   if(!is.na(FPS)) {
     p$FPS=FPS
   }  
-  if(!is.na(Smooth.Speed.Data)) {
-    p$Smooth.Speed.Data=Smooth.Speed.Data  
+  if(!is.na(Speed.Window.sec)) {
+    p$Speed.Window.sec=Speed.Window.sec  
   }
   if(!is.na(Filter.Sleep)) {
     p$Filter.Sleep=Filter.Sleep  
@@ -199,7 +199,7 @@ Parameters.AreParametersEqual<-function(p1,p2){
   if(p1$Walking.mm.sec!=p2$Walking.mm.sec) {
     result<-FALSE
   }
-  if(p1$Smooth.Speed.Data!=p2$Smooth.Speed.Data) {
+  if(p1$Speed.Window.sec!=p2$Speed.Window.sec) {
     result<-FALSE
   }
   if(p1$ObservationTime.sec!=p2$ObservationTime.sec) {

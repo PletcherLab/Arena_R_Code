@@ -9,6 +9,7 @@ require(plyr)
 require(dplyr)
 require(ggplot2)
 require(gtools)
+require(zoo)
 
 
 ArenaClass<-function(parameters,dirname="Data"){
@@ -245,24 +246,6 @@ Load.DDrop.Object<-function(parameters,filename,dirname,runNumber){
   assign(st,DDrop,pos=1)  
   print(paste("DDrop run",filename,"saved as",st))
   DDrop
-}
-
-Arena.ChangeParameterObject<-function(arena,newP) {
-  for(i in 1:nrow(arena$Trackers)){
-    id<-arena$Trackers[i,]
-    if(length(id)<2){
-      tmp<-paste("Tracker_",id,sep="")  
-    }
-    else if(length(id)==2){
-      tmp<-paste("Tracker_",id$TrackingRegion,"_",id$ObjectID,sep="")
-    }
-    else{
-      tmp=""
-    }
-    t<-Arena.GetTracker(arena,id)
-    arena[[tmp]]<-Tracker.ChangeParameterObject(t,newP)
-  }
-  arena
 }
 
 

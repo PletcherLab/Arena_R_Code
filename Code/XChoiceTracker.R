@@ -43,7 +43,7 @@ Summarize.XChoiceTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   perc.MicroMoving<-sum(rd$MicroMoving)/length(rd$MicroMoving)
   perc.Resting<-sum(rd$Resting)/length(rd$Resting)
   
-  avg.speed<-mean(rd$ModifiedSpeed_mm_s)
+  avg.speed<-mean(rd$Speed_mm_s)
   
   treatments<-unique(tracker$ExpDesign$Treatment)    
   if(length(treatments)!=2) {    
@@ -62,7 +62,7 @@ Summarize.XChoiceTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   var.x<-var(rd$Xpos_mm)
   
   results<-data.frame(tracker$ID,total.min,total.dist,avg.x,var.x,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,avg.speed,range[1],range[2],r.tmp)
-  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","AvgXPosmm","VarXPosmm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed","StartMin","EndMin",treatments)
+  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","AvgXPosmm","VarXPosmm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed_mm_s","StartMin","EndMin",treatments)
   
   if(ShowPlot){
     tmp<-data.frame(c(results$PercWalking,results$PercMicroMoving,results$PercResting,results$PercSleeping),rep("one",4), factor(c("Walking","MicroMoving","Resting","Sleeping")))

@@ -118,7 +118,7 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   perc.MicroMoving <- sum(rd$MicroMoving) / length(rd$MicroMoving)
   perc.Resting <- sum(rd$Resting) / length(rd$Resting)
   
-  avg.speed <- mean(rd$ModifiedSpeed_mm_s)
+  avg.speed <- mean(rd$Speed_mm_s)
   
   regions <- tracker$CountingROI
   r.tmp <- matrix(rep(-1, length(regions)), nrow = 1)
@@ -194,7 +194,7 @@ Summarize.CentrophobismTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
       "PercWalking",
       "PercMicroMoving",
       "PercResting",
-      "AvgSpeed",
+      "AvgSpeed_mm_s",
       "StartMin",
       "EndMin",
       "TotalFrames",

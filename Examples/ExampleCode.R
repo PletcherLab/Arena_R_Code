@@ -34,6 +34,14 @@ p<-Parameters.SetParameter(p,FPS=NA)
 ## Notably, make sure the mmPerPixel value is correct for your setup.
 ## Note that sleep is not currently implemented.
 
+
+## Depending on your FPS, you might consider an appropriate window size for speed calculations.
+## This value is in sec and specifies the period over which speed is determined.
+## The default is 1 sec, which should be okay for most cases, except maybe for very high or 
+## very low frame rates.
+#speed.window.sec<-2
+#p<-Parameters.SetParameter(p,Speed.Window.sec=speed.window.sec)
+
 ## change parameters as you need
 ##p<-SetParameter(p,Filter.Sleep=1)
 ##p<-SetParameter(p,Filter.Tracker.Error=`1)

@@ -18,6 +18,14 @@ p<-ParametersClass.CentrophobismTracker()
 ## saved in the output file by DTrack.
 p<-Parameters.SetParameter(p,FPS=NA)
 
+
+## Depending on your FPS, you might consider an appropriate window size for speed calculations.
+## This value is in sec and specifies the period over which speed is determined.
+## The default is 1 sec, which should be okay for most cases, except maybe for very high or 
+## very low frame rates.
+#speed.window.sec<-2
+#p<-Parameters.SetParameter(p,Speed.Window.sec=speed.window.sec)
+
 ## This value is good for the Arenas
 mm.per.pixel<-0.17
 

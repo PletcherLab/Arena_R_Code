@@ -34,7 +34,7 @@ p<-Parameters.SetParameter(p,FPS=NA)
 ## very low frame rates.
 #speed.window.sec<-2
 #p<-Parameters.SetParameter(p,Speed.Window.sec=speed.window.sec)
-
+   
 ## This value is for the new Obscura CCD camera setup
 mm.per.pixel<-0.17
 p<-Parameters.SetParameter(p,mmPerPixel=mm.per.pixel)

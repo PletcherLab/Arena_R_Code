@@ -520,7 +520,6 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
   tmp2[rd$MicroMoving] <- "Micromoving"
   
   Movement <- factor(tmp2)
-  print(rd)
   ylims <-
     c(tracker$ROI[1] / -2, tracker$ROI[1] / 2) * tracker$Parameters$mmPerPixel
   
@@ -537,7 +536,7 @@ PlotX.Tracker <- function(tracker, range = c(0, 0)) {
       ),
       show.legend = F
     ) +
-    scale_fill_manual(values = alpha(c("gray", "red", "red"), .07)) +
+    scale_fill_manual(values = alpha(c("gray", "red", "red","red"), .07)) +
     geom_line(linewidth = 0.5) + 
     geom_point(aes(group = 1, color = Movement), size = 2)+
     ylim(ylims)

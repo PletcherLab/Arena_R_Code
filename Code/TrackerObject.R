@@ -145,7 +145,7 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
              DeltaSecWindow=rollapply(DeltaSec,window.size,sum,align='right', partial=TRUE, fill=NA),
              Speed_mm_s = DistWindow_mm/DeltaSecWindow)
   }
-  
+  tdata <- tdata %>% mutate(Speed_mm_s = ifelse(is.na(Speed_mm_s), 0, Speed_mm_s))
   tracker$RawData <- tdata
   
   tracker

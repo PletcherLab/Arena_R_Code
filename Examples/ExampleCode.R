@@ -51,7 +51,7 @@ p<-Parameters.SetParameter(p,FPS=NA)
 ## a parameter to the ArenaClass function
 ## ArenaClass<-function(parameters,dirname="Data")
 
-arena<-ArenaClass(p,dirname="GeneralTrackingData")
+arena<-ArenaClass(p,dirname="./Data/GeneralTrackingData")
 
 ## Basic movement information and region summaries can be obtained from
 Summarize(arena)

@@ -17,6 +17,7 @@ TrackerClass.RawDataFrame <-
            roisize,
            theCountingROI,
            expDesign) {
+   
     tmp <- data
     tmp <-
       subset(tmp,
@@ -60,6 +61,7 @@ TrackerClass.RawDataFrame <-
       RawData = tmp,
       ExpDesign = expDesign
     )
+   
     class(data) = "Tracker"
     if (parameters$TType == "TwoChoiceTracker") {
       data <- TwoChoiceTracker.ProcessTwoChoiceTracker(data)
@@ -80,7 +82,6 @@ TrackerClass.RawDataFrame <-
     else{
       data <- Tracker.ProcessGeneralTracker(data)
     }
-    
     ## The class is done, now can add default operations to it
     ## before returning.
     data <- Tracker.Calculate.SpeedsAndFeeds(data)
@@ -129,7 +130,6 @@ Tracker.Calculate.SpeedsAndFeeds <- function(tracker) {
            Dist_mm = sqrt(DeltaX_mm * DeltaX_mm + DeltaY_mm * DeltaY_mm),
            DeltaSec = c(0,diff(Minutes)*60)
     )
-  
   ## Try to focus on distance moved over a window specified in the parameters object.
   ## The window size is based on average, but actual speed uses exact time elapsed.
   window.size<-round(1/mean(diff(tdata$Minutes)*60))*tracker$Parameters$Speed.Window.sec

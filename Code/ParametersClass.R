@@ -105,10 +105,11 @@ ParametersClass.PairwiseInteractionCounter=function(Interaction.Dist.mm=8){
   mmPerPixel=0.056
   MicroMove.mm.sec<-c(0.2,2.0)
   Walking.mm.sec<-2.0
+  Speed.Window.sec<-1
   Smooth.Speed.Data<-TRUE
   FPS=NA
   TType="PairwiseInteractionCounter"
-  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
+  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS,Speed.Window.sec=Speed.Window.sec, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
             Sleep.Threshold.Distance.mm=Sleep.Threshold.Distance.mm,MicroMove.mm.sec=MicroMove.mm.sec,Walking.mm.sec=Walking.mm.sec,Interaction.Distance.mm=Interaction.Dist.mm,TType=TType)
   class(tmp)="ParametersObject"
   tmp
@@ -123,9 +124,10 @@ ParametersClass.PairwiseInteractionTracker=function(Interaction.Dist.mm=8){
   MicroMove.mm.sec<-c(0.2,2.0)
   Walking.mm.sec<-2.0
   Smooth.Speed.Data<-TRUE
+  Speed.Window.sec<-1
   FPS=NA
   TType="PairwiseInteractionTracker"
-  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
+  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS,Speed.Window.sec=Speed.Window.sec, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
             Sleep.Threshold.Distance.mm=Sleep.Threshold.Distance.mm,MicroMove.mm.sec=MicroMove.mm.sec,Walking.mm.sec=Walking.mm.sec,Interaction.Distance.mm=Interaction.Dist.mm,TType=TType)
   class(tmp)="ParametersObject"
   tmp
@@ -138,11 +140,12 @@ ParametersClass.SocialDistanceCounter=function(Interacting.Entities=5){
   Sleep.Threshold.Min=5
   mmPerPixel=0.056
   MicroMove.mm.sec<-c(0.2,2.0)
+  Speed.Window.sec<-1
   Walking.mm.sec<-2.0
   Smooth.Speed.Data<-TRUE
   FPS=NA
   TType="SocialDistanceCounter"
-  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
+  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS,Speed.Window.sec=Speed.Window.sec, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
             Sleep.Threshold.Distance.mm=Sleep.Threshold.Distance.mm,MicroMove.mm.sec=MicroMove.mm.sec,Walking.mm.sec=Walking.mm.sec,Interacting.Entities=Interacting.Entities,TType=TType)
   class(tmp)="ParametersObject"
   tmp
@@ -157,9 +160,10 @@ ParametersClass.TwoChoiceCounter=function(){
   MicroMove.mm.sec<-c(0.2,2.0)
   Walking.mm.sec<-2.0
   Smooth.Speed.Data<-TRUE
+  Speed.Window.sec<-1
   FPS=NA
   TType="TwoChoiceCounter"
-  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
+  tmp<-list(mmPerPixel=mmPerPixel,FPS=FPS,Speed.Window.sec=Speed.Window.sec, Smooth.Speed.Data=Smooth.Speed.Data,Filter.Sleep=Filter.Sleep,Filter.Tracker.Error=Filter.Tracker.Error,Sleep.Threshold.Min=Sleep.Threshold.Min,
             Sleep.Threshold.Distance.mm=Sleep.Threshold.Distance.mm,MicroMove.mm.sec=MicroMove.mm.sec,Walking.mm.sec=Walking.mm.sec,TType=TType)
   class(tmp)="ParametersObject"
   tmp

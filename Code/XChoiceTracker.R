@@ -45,24 +45,24 @@ Summarize.XChoiceTracker<-function(tracker,range=c(0,0),ShowPlot=TRUE){
   
   avg.speed<-mean(rd$Speed_mm_s)
   
-  treatments<-unique(tracker$ExpDesign$Treatment)    
-  if(length(treatments)!=2) {    
-    stop("Wrong number of treatments!") 
-  }
+  #treatments<-unique(tracker$ExpDesign$Treatment)    
+  #if(length(treatments)!=2) {    
+  #  stop("Wrong number of treatments!") 
+  #}
 
-  treatments<-c(treatments,"None")
-  tmp<-tracker$ExpDesign
-  a<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[1]])
-  b<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[2]])
-  c<-sum(rd$CountingRegion==treatments[3])
+  #treatments<-c(treatments,"None")
+  #tmp<-tracker$ExpDesign
+  ##a<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[1]])
+  #b<-sum(rd$CountingRegion==tmp$CountingRegion[tmp$Treatment==treatments[2]])
+  #c<-sum(rd$CountingRegion==treatments[3])
   
-  r.tmp<-matrix(c(a,b,c),nrow=1)
+  #r.tmp<-matrix(c(a,b,c),nrow=1)
   
   avg.x<-mean(rd$Xpos_mm)
   var.x<-var(rd$Xpos_mm)
   
-  results<-data.frame(tracker$ID,total.min,total.dist,avg.x,var.x,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,avg.speed,range[1],range[2],r.tmp)
-  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","AvgXPosmm","VarXPosmm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed_mm_s","StartMin","EndMin",treatments)
+  results<-data.frame(tracker$ID,total.min,total.dist,avg.x,var.x,perc.Sleeping,perc.Walking,perc.MicroMoving,perc.Resting,avg.speed,range[1],range[2])
+  names(results)<-c( "ObjectID","TrackingRegion","ObsMinutes","TotalDist_mm","AvgXPosmm","VarXPosmm","PercSleeping","PercWalking","PercMicroMoving","PercResting","AvgSpeed_mm_s","StartMin","EndMin")
   
   if(ShowPlot){
     tmp<-data.frame(c(results$PercWalking,results$PercMicroMoving,results$PercResting,results$PercSleeping),rep("one",4), factor(c("Walking","MicroMoving","Resting","Sleeping")))
